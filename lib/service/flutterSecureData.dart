@@ -1,0 +1,145 @@
+import 'dart:convert';
+
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+class FlutterSecureData {
+  static const _storage = FlutterSecureStorage();
+
+  // static const String contentId = "1";
+  static const String useName = "userName";
+  static const String password = "password";
+  static const String checked = "isChecked";
+  static const String isLoggedIn='isLoggedIn';
+  static const String isCheckdIn= 'isCheckdIn';
+  static const String userData='userData';
+  static const String doneTask='doneTask';
+  static const String toDoTask='todoTask';
+  static const String notesTasks='noteTasks';
+
+
+
+    // set get and delete the username
+  static Future<void> setTodo(String data) {
+    return _storage.write(key: toDoTask, value: data);
+  }
+
+  static Future<String?> getTodo() {
+    return _storage.read(key: toDoTask);
+  }
+
+  static Future<void> deleteTodo() {
+    return _storage.delete(key: toDoTask);
+  }
+    // set get and delete the username
+  static Future<void> setUserData(String userDataa) {
+    return _storage.write(key: userData, value: userDataa);
+  }
+
+  static Future<String?> getUserData() {
+    return _storage.read(key: userData);
+  }
+
+  static Future<void> deleteUserData() {
+    return _storage.delete(key: userData);
+  }
+
+    static Future<void> setTasks(String tasks) {
+    return _storage.write(key:notesTasks , value: tasks);
+  }
+
+  static Future<String?> getTasks() {
+    return _storage.read(key: notesTasks);
+  }
+
+  static Future<void> deleteTasks() {
+    return _storage.delete(key: notesTasks);
+  }
+
+      // set get and delete the username
+  static Future<void> setDoneTask(String userDataa) {
+    return _storage.write(key: doneTask, value: userDataa);
+  }
+
+  static Future<String?> getDoneTask() {
+    return _storage.read(key: doneTask);
+  }
+
+  static Future<void> deleteDoneTask() {
+    return _storage.delete(key: doneTask);
+  }
+
+
+  // set get and delete the username
+  static Future<void> setUserName(String usename) {
+    return _storage.write(key: useName, value: usename);
+  }
+
+  static Future<String?> getUserName() {
+    return _storage.read(key: useName);
+  }
+
+  static Future<void> deleteUserName() {
+    return _storage.delete(key: useName);
+  }
+
+  // set get and delete the password
+
+  static Future<void> setPassword(String passWord) {
+    return _storage.write(key: password, value: passWord);
+  }
+
+  static Future<String?> getPassword() {
+    return _storage.read(key: password);
+  }
+
+  static Future<void> deletePassword() {
+    return _storage.delete(key: password);
+  }
+
+  // set get and delete remember me 
+
+  static Future<void> setRememberMe(bool isChecked) {
+    return _storage.write(key: checked, value: isChecked.toString());
+  }
+
+  static Future<String?> getRememberMe() {
+    return _storage.read(key: checked);
+  }
+  static Future<void> deleteRememberMe(){
+    return  _storage.delete(key:checked);
+  }
+
+  // set get and delete the is logged in boolean
+  static Future<void> setIsLoggedIn(String isLogged) {
+    return _storage.write(key:isLoggedIn , value: isLogged);
+  }
+
+  static Future<String?> getIsLoggedIn() {
+    return _storage.read(key: isLoggedIn);
+  }
+
+  static Future<void> deleteIsLoggedIn() {
+    return _storage.delete(key: isLoggedIn);
+  }
+
+    // set get and delete the isCheckdIn
+  static Future<void> setisCheckdIn(String isCheckdIn) {
+    return _storage.write(key: isCheckdIn, value: isCheckdIn);
+  }
+
+  static Future<String?> getisCheckdIn() {
+    return _storage.read(key: isCheckdIn);
+  }
+
+  static Future<void> deleteisCheckdIn() {
+    return _storage.delete(key: isCheckdIn);
+  }
+
+
+
+
+  // delete all the secureStorage information\
+  static Future<void> deleteWholeSecureData(){
+    return _storage.deleteAll();
+  }
+}
