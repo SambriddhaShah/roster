@@ -4,6 +4,7 @@ import 'package:rooster_empployee/constants/appColors.dart';
 import 'package:rooster_empployee/constants/appTextStyles.dart';
 import 'package:rooster_empployee/routes/route_generator.dart';
 import 'package:rooster_empployee/routes/routes.dart';
+import 'package:rooster_empployee/screens/Interview%20Stages/presentation/interview_stages.dart';
 import 'package:rooster_empployee/screens/login/bloc/signIn_bloc.dart';
 import 'package:rooster_empployee/screens/otpVerification/presentation/otpVerificationPage.dart';
 import 'package:rooster_empployee/service/flutterSecureData.dart';
@@ -174,9 +175,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       width: MediaQuery.of(context).size.width,
                       child: loginForm()),
-                      // ElevatedButton(onPressed: (){
-                      //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => OtpVerificationPage(phoneNumber: '+977-9806280992',)));
-                      // }, child: Text('Press me'))
+                  // ElevatedButton(onPressed: (){
+                  //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => OtpVerificationPage(phoneNumber: '+977-9806280992',)));
+                  // }, child: Text('Press me'))
                 ],
               ),
             ),
@@ -277,12 +278,18 @@ class _LoginPageState extends State<LoginPage> {
                       }),
                   Text(
                     "Remember me",
-                    style: AppTextStyles.bodySmall.copyWith(color: Colors.white),
+                    style:
+                        AppTextStyles.bodySmall.copyWith(color: Colors.white),
                   )
                 ],
               ),
               TextButton(
-                  onPressed: () {}, child: const Text('Forgot Password?', style: TextStyle(color: AppColors.textPrimary),))
+                  onPressed: () {},
+                  child: const Text(
+                    'Forgot Password?',
+                    style:
+                        TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                  ))
             ],
           ),
           ElevatedButton(
@@ -294,7 +301,10 @@ class _LoginPageState extends State<LoginPage> {
                   ToastMessage.showMessage('Enter all Essential data');
                 }
               },
-              child: const Text('Sign In', style: TextStyle(color: Colors.white),)),
+              child: const Text(
+                'Sign In',
+                style: TextStyle(color: Colors.white),
+              )),
           SizedBox(
             height: 20.h,
           ),
@@ -310,7 +320,10 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.of(context).push(RouteGenerator()
                         .generateRoute(RouteSettings(name: Routes.signup)));
                   },
-                  child: const Text('Sign Up', style: TextStyle(color: AppColors.textPrimary),))
+                  child: const Text(
+                    'Sign Up',
+                    style: TextStyle(color: AppColors.textPrimary),
+                  ))
             ],
           )
         ],
@@ -319,9 +332,18 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _handelSucessfulLogin() {
-    Navigator.of(context).pushReplacement(RouteGenerator()
-        .generateRoute(const RouteSettings(name: Routes.botomNav)));
-    FlutterSecureData.setIsLoggedIn('true');
+    if (username.text == "jondoe@gmail.com") {
+      FlutterSecureData.setIsHired(false);
+      FlutterSecureData.setIsLoggedIn('true');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => InterviewDashboardPage()),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(RouteGenerator()
+          .generateRoute(const RouteSettings(name: Routes.botomNav)));
+      FlutterSecureData.setIsLoggedIn('true');
+    }
   }
 
   void _handleRememberMe(

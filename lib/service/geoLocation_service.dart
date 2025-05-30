@@ -8,7 +8,7 @@ class LocationService {
       27.7400019; // Replace with your office latitude
   static const double officeLongitude =
       85.3385576; // Replace with your office longitude
-  static const double checkRadius = 10.0; // 100 meters radius for check-in
+  static const double checkRadius = 10.0; // 10 meters radius for check-in
 
   static Future<void> startLocationTracking() async {
     await bg.BackgroundGeolocation.ready(bg.Config(
@@ -20,7 +20,7 @@ class LocationService {
       logLevel: bg.Config.LOG_LEVEL_OFF,
       enableHeadless: true, // Ensures tracking even after termination
       foregroundService: true, // Ensures long-running background execution
-      heartbeatInterval: 60, // 10 minutes in seconds (600s)
+      heartbeatInterval: 60, // 1 minutes in seconds (60s)
     )).then((bg.State state) {
       if (!state.enabled) {
         bg.BackgroundGeolocation.start();
@@ -54,6 +54,8 @@ class LocationService {
     if (distance <= checkRadius) {
       print("✅ User is inside the office zone.");
     } else {
+      print(
+          'the office latitude is $officeLatitude and the office longitude is $officeLongitude and the current latitude is $lat and the current longitude is $lon');
       print("❌ User is outside the office zone.");
     }
   }

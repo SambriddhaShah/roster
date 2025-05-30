@@ -9,16 +9,15 @@ class FlutterSecureData {
   static const String useName = "userName";
   static const String password = "password";
   static const String checked = "isChecked";
-  static const String isLoggedIn='isLoggedIn';
-  static const String isCheckdIn= 'isCheckdIn';
-  static const String userData='userData';
-  static const String doneTask='doneTask';
-  static const String toDoTask='todoTask';
-  static const String notesTasks='noteTasks';
+  static const String isLoggedIn = 'isLoggedIn';
+  static const String isCheckdIn = 'isCheckdIn';
+  static const String userData = 'userData';
+  static const String doneTask = 'doneTask';
+  static const String toDoTask = 'todoTask';
+  static const String notesTasks = 'noteTasks';
+  static const String isHired = "isHired";
 
-
-
-    // set get and delete the username
+  // set get and delete the username
   static Future<void> setTodo(String data) {
     return _storage.write(key: toDoTask, value: data);
   }
@@ -30,7 +29,8 @@ class FlutterSecureData {
   static Future<void> deleteTodo() {
     return _storage.delete(key: toDoTask);
   }
-    // set get and delete the username
+
+  // set get and delete the username
   static Future<void> setUserData(String userDataa) {
     return _storage.write(key: userData, value: userDataa);
   }
@@ -43,8 +43,8 @@ class FlutterSecureData {
     return _storage.delete(key: userData);
   }
 
-    static Future<void> setTasks(String tasks) {
-    return _storage.write(key:notesTasks , value: tasks);
+  static Future<void> setTasks(String tasks) {
+    return _storage.write(key: notesTasks, value: tasks);
   }
 
   static Future<String?> getTasks() {
@@ -55,7 +55,7 @@ class FlutterSecureData {
     return _storage.delete(key: notesTasks);
   }
 
-      // set get and delete the username
+  // set get and delete the username
   static Future<void> setDoneTask(String userDataa) {
     return _storage.write(key: doneTask, value: userDataa);
   }
@@ -68,6 +68,20 @@ class FlutterSecureData {
     return _storage.delete(key: doneTask);
   }
 
+  //set get and delete isHired
+  static Future<void> setIsHired(bool isHired) {
+    return _storage.write(
+        key: FlutterSecureData.isHired, value: isHired.toString());
+  }
+
+  static Future<String> getIsHired() async {
+    String? value = await _storage.read(key: FlutterSecureData.isHired);
+    return value == 'true' ? "true" : "false";
+  }
+
+  static Future<void> deleteIsHired() {
+    return _storage.delete(key: FlutterSecureData.isHired);
+  }
 
   // set get and delete the username
   static Future<void> setUserName(String usename) {
@@ -96,7 +110,7 @@ class FlutterSecureData {
     return _storage.delete(key: password);
   }
 
-  // set get and delete remember me 
+  // set get and delete remember me
 
   static Future<void> setRememberMe(bool isChecked) {
     return _storage.write(key: checked, value: isChecked.toString());
@@ -105,13 +119,14 @@ class FlutterSecureData {
   static Future<String?> getRememberMe() {
     return _storage.read(key: checked);
   }
-  static Future<void> deleteRememberMe(){
-    return  _storage.delete(key:checked);
+
+  static Future<void> deleteRememberMe() {
+    return _storage.delete(key: checked);
   }
 
   // set get and delete the is logged in boolean
   static Future<void> setIsLoggedIn(String isLogged) {
-    return _storage.write(key:isLoggedIn , value: isLogged);
+    return _storage.write(key: isLoggedIn, value: isLogged);
   }
 
   static Future<String?> getIsLoggedIn() {
@@ -122,7 +137,7 @@ class FlutterSecureData {
     return _storage.delete(key: isLoggedIn);
   }
 
-    // set get and delete the isCheckdIn
+  // set get and delete the isCheckdIn
   static Future<void> setisCheckdIn(String isCheckdIn) {
     return _storage.write(key: isCheckdIn, value: isCheckdIn);
   }
@@ -135,11 +150,8 @@ class FlutterSecureData {
     return _storage.delete(key: isCheckdIn);
   }
 
-
-
-
   // delete all the secureStorage information\
-  static Future<void> deleteWholeSecureData(){
+  static Future<void> deleteWholeSecureData() {
     return _storage.deleteAll();
   }
 }

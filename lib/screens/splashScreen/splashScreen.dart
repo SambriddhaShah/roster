@@ -15,24 +15,17 @@
 
 // class _SplashScreenState extends State<SplashScreen> {
 
-//   bool isLoggedIn= false; 
+//   bool isLoggedIn= false;
 
 //   @override
 //   void initState() {
 //     super.initState();
 
-         
 //     Timer(Duration(seconds: 3), () {
-   
-            
+
 //       Navigator.of(context).pushReplacement(RouteGenerator()
 //           .generateRoute(const RouteSettings(name: Routes.dashboard)));
 
-    
-    
-
-      
-   
 //     });
 //   }
 
@@ -71,7 +64,6 @@
 //     }
 //   }
 
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -79,9 +71,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rooster_empployee/constants/appColors.dart';
 import 'package:rooster_empployee/routes/route_generator.dart';
 import 'package:rooster_empployee/routes/routes.dart';
+import 'package:rooster_empployee/screens/Interview%20Stages/presentation/interview_stages.dart';
 import 'package:rooster_empployee/screens/dashboard/presentaion/dashboard_page.dart';
 import 'package:rooster_empployee/service/flutterSecureData.dart';
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -90,41 +82,42 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
-  
-  bool isLoggedIn= false; 
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  bool isLoggedIn = false;
+  bool isHired = false;
 
   @override
   void initState() {
     getIsLoggedIn();
     super.initState();
 
-         
     Timer(Duration(seconds: 3), () {
-      if(isLoggedIn){
-            
-      Navigator.of(context).pushReplacement(RouteGenerator()
-          .generateRoute(const RouteSettings(name: Routes.botomNav)));
-
-      }else{
-            
-      Navigator.of(context).pushReplacement(RouteGenerator()
-          .generateRoute(const RouteSettings(name: Routes.login)));
-
+      if (isLoggedIn) {
+        if (isHired) {
+          Navigator.of(context).pushReplacement(RouteGenerator()
+              .generateRoute(const RouteSettings(name: Routes.botomNav)));
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => InterviewDashboardPage()),
+          );
+        }
+      } else {
+        Navigator.of(context).pushReplacement(RouteGenerator()
+            .generateRoute(const RouteSettings(name: Routes.login)));
       }
-    
-
-      
-   
     });
   }
 
-  void getIsLoggedIn()async{
-    var data = await FlutterSecureData.getIsLoggedIn()??'';
-    setState((){
-      isLoggedIn= toBoolean(data) ;
-
-    });     
+  void getIsLoggedIn() async {
+    var data = await FlutterSecureData.getIsLoggedIn() ?? '';
+    var hired = await FlutterSecureData.getIsHired() ?? '';
+    print('the isHired value is $hired');
+    setState(() {
+      isLoggedIn = toBoolean(data);
+      isHired = toBoolean(hired);
+    });
   }
 
   @override
@@ -147,7 +140,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               color: AppColors.primary,
             ),
             const SizedBox(height: 20),
-            
+
             // App Name
             Text(
               "Rooster",
@@ -158,7 +151,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 letterSpacing: 1.2,
               ),
             ),
-            
+
             // Loading Indicator
             const SizedBox(height: 30),
             CircularProgressIndicator(
@@ -170,11 +163,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
   }
 }
-  // Convert a string to a boolean value
-  bool toBoolean(String string) {
-    if (string == 'true') {
-      return true;
-    } else {
-      return false;
-    }
+
+// Convert a string to a boolean value
+bool toBoolean(String string) {
+  if (string == 'true') {
+    return true;
+  } else {
+    return false;
   }
+}

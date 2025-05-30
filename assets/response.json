@@ -1,0 +1,45 @@
+{
+  "user": {
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "address": "123 Main Street, Springfield",
+    "phone": "+1-555-123-4567",
+    "profileImage": "https://i.pravatar.cc/150?img=12"
+  },
+  "job": {
+    "title": "Senior Flutter Developer",
+    "company": "Tech Innovations Inc.",
+    "location": "Remote",
+    "experienceRequired": "3-5 years",
+    "employmentType": "Full-time",
+    "descriptionBullets": [
+      "Build scalable cross-platform apps using Flutter.",
+      "Collaborate with UI/UX designers and backend teams.",
+      "Maintain code quality and write unit tests."
+    ],
+    "skills": ["Flutter", "Dart", "REST APIs", "Git"]
+  },
+  "interviewStages": [
+    {
+      "stageName": "Technical Round 1",
+      "status": "passed",
+      "interviewer": "Alice Smith",
+      "taskDone": "Code challenge on data structures",
+      "comments": "Great problem-solving skills"
+    },
+    {
+      "stageName": "Technical Round 2",
+      "status": "failed",
+      "failureReason": "Did not meet the expectations in system design",
+      "deactivationMessage": "This account will be deactivated from now on."
+    },
+    {
+      "stageName": "HR Interview",
+      "status": "ongoing",
+      "description": "Final discussion with HR on expectations and role fit.",
+      "type": "virtual",
+      "interviewer": "Robert Lane",
+      "meetingLink": "https://meet.example.com/hr-round"
+    }
+  ]
+}

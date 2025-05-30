@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:rooster_empployee/constants/appColors.dart';
 import 'package:rooster_empployee/constants/appTextStyles.dart';
 
-
 final ThemeData appTheme = ThemeData(
   colorScheme: const ColorScheme.light(
     primary: AppColors.primary,
@@ -22,13 +21,14 @@ final ThemeData appTheme = ThemeData(
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.primary,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: AppColors.primary, padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      foregroundColor: AppColors.primary,
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
     ),
   ),
   inputDecorationTheme: InputDecorationTheme(
