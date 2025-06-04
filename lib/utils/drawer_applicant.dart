@@ -106,19 +106,18 @@ class _DrawerWidgetApplicantState extends State<DrawerWidgetApplicant> {
 
           ListTile(
             leading: Icon(
-              Icons.person_2_outlined,
+              Icons.document_scanner_outlined,
               color: AppColors.textPrimary,
               size: 20.sp,
             ),
             title: Text(
-              'PROFILE',
+              'DOCUMENTS',
               style: AppTextStyles.bodySmall,
             ),
             onTap: () {
               Navigator.of(context).push(
                 RouteGenerator().generateRoute(
-                  const RouteSettings(
-                      name: Routes.profilePage, arguments: 'admin'),
+                  const RouteSettings(name: Routes.uploadDocuments),
                 ),
               );
             },

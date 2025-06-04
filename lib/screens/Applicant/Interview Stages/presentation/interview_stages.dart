@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rooster_empployee/constants/appTextStyles.dart';
-import 'package:rooster_empployee/screens/Interview%20Stages/models/model.dart';
+import 'package:rooster_empployee/screens/Applicant/Interview%20Stages/models/model.dart';
 import 'package:rooster_empployee/utils/drawer_applicant.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,7 +13,7 @@ class InterviewDashboardPage extends StatefulWidget {
   State<InterviewDashboardPage> createState() => _InterviewDashboardPageState();
 }
 
-class _InterviewDashboardPageState extends State<InterviewDashboardPage> { 
+class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
   late Future<ApiResponse> _futureData;
   List<bool> _expandedStates = [];
   bool _showFullJobDesc = false;
@@ -169,7 +169,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("📌 Interview Stages",
+                  Text("📌 Hiring Stages",
                       style: TextStyle(
                           fontSize: media.width * 0.045,
                           fontWeight: FontWeight.bold)),
@@ -332,7 +332,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
       },
       child: AnimatedSize(
         duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+        curve: Curves.easeInOutCubic,
         child: Stack(
           children: [
             Container(

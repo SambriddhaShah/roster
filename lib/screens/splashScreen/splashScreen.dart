@@ -71,7 +71,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rooster_empployee/constants/appColors.dart';
 import 'package:rooster_empployee/routes/route_generator.dart';
 import 'package:rooster_empployee/routes/routes.dart';
-import 'package:rooster_empployee/screens/Interview%20Stages/presentation/interview_stages.dart';
+import 'package:rooster_empployee/screens/Applicant/Interview%20Stages/presentation/interview_stages.dart';
 import 'package:rooster_empployee/screens/dashboard/presentaion/dashboard_page.dart';
 import 'package:rooster_empployee/service/flutterSecureData.dart';
 

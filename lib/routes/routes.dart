@@ -19,5 +19,8 @@ class Routes {
 
   //  calendar page route
   static const String calendar='/calendar';
+
+  //  applicant upload documents page route
+  static const String uploadDocuments = '/uploadDocuments';
   
 }

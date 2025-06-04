@@ -4,7 +4,7 @@ import 'package:rooster_empployee/constants/appColors.dart';
 import 'package:rooster_empployee/constants/appTextStyles.dart';
 import 'package:rooster_empployee/routes/route_generator.dart';
 import 'package:rooster_empployee/routes/routes.dart';
-import 'package:rooster_empployee/screens/Interview%20Stages/presentation/interview_stages.dart';
+import 'package:rooster_empployee/screens/Applicant/Interview%20Stages/presentation/interview_stages.dart';
 import 'package:rooster_empployee/screens/login/bloc/signIn_bloc.dart';
 import 'package:rooster_empployee/screens/otpVerification/presentation/otpVerificationPage.dart';
 import 'package:rooster_empployee/service/flutterSecureData.dart';

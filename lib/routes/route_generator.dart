@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rooster_empployee/bottomNavigation/mainPage.dart';
 import 'package:rooster_empployee/routes/routes.dart';
+import 'package:rooster_empployee/screens/Applicant/upload_documents/bloc/upload_bloc.dart';
+import 'package:rooster_empployee/screens/Applicant/upload_documents/presentation/upload_documents_page.dart';
 import 'package:rooster_empployee/screens/calendar/bloc/calendar_bloc.dart';
 import 'package:rooster_empployee/screens/calendar/presentation/calendarPage.dart';
 import 'package:rooster_empployee/screens/dashboard/bloc/dashboard_bloc.dart';
@@ -38,6 +40,7 @@ class RouteGenerator {
   final HistoryBloc _historyBloc = HistoryBloc();
 
   final CalendarBloc _calendarBloc = CalendarBloc();
+  final UploadBloc _uploadBloc = UploadBloc();
 
   Route<dynamic> generateRoute(RouteSettings settings) {
     final args = settings.arguments;
@@ -106,6 +109,17 @@ class RouteGenerator {
               value: _signupBloc,
             ),
           ], child: SignupPage()),
+        );
+      case Routes.uploadDocuments:
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider<UploadBloc>.value(
+                value: _uploadBloc,
+              ),
+            ],
+            child: const UploadDocumentsPage(),
+          ),
         );
 
       case Routes.profilePage:
