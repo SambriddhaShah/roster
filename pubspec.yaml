@@ -59,6 +59,7 @@ dependencies:
   open_filex: ^4.3.2
   equatable: ^2.0.5
   file_picker:
+  webview_flutter:
 
 dev_dependencies:
   flutter_test:

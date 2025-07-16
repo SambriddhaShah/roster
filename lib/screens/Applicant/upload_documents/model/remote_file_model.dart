@@ -1,29 +1,23 @@
-// remote_file.dart
 class RemoteFile {
-  final String id;
+  final String id; // Use path or hash as fallback
   final String name;
-  final String url;
+  final String path;
+  final String type;
 
-  const RemoteFile({
+  RemoteFile({
     required this.id,
     required this.name,
-    required this.url,
+    required this.path,
+    required this.type,
   });
 
   factory RemoteFile.fromJson(Map<String, dynamic> json) {
+    final path = json['documentPath'] ?? '';
     return RemoteFile(
-      id: json['id'],
-      name: json['name'],
-      url: json['url'],
+      id: path.hashCode.toString(), // if no real ID, use hash of path
+      name: json['documentName'] ?? 'Unnamed File',
+      path: path,
+      type: json['docstype'] ?? 'Document',
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'url': url,
-      };
-
-  @override
-  String toString() => 'RemoteFile(name: $name)';
 }

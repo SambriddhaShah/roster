@@ -98,10 +98,12 @@ class _SplashScreenState extends State<SplashScreen>
           Navigator.of(context).pushReplacement(RouteGenerator()
               .generateRoute(const RouteSettings(name: Routes.botomNav)));
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => InterviewDashboardPage()),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => InterviewDashboardPage()),
+          // );
+          Navigator.of(context).pushReplacement(RouteGenerator().generateRoute(
+              const RouteSettings(name: Routes.applicantMainPage)));
         }
       } else {
         Navigator.of(context).pushReplacement(RouteGenerator()

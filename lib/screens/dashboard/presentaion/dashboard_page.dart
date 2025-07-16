@@ -48,7 +48,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    _requestLocationPermission();
+    // _requestLocationPermission();
     getWorkLocation();
     currentTime = DateTime.now();
     context.read<DashboardBloc>().add(InitialEvent());
@@ -90,23 +90,23 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   // Request location permission
-  Future<void> _requestLocationPermission() async {
-    // Check if permission is already granted
-    var status = await Permission.location.status;
-    if (!status.isGranted) {
-      // Request permission if not granted
-      await Permission.location.request();
-    }
+  // Future<void> _requestLocationPermission() async {
+  //   // Check if permission is already granted
+  //   var status = await Permission.location.status;
+  //   if (!status.isGranted) {
+  //     // Request permission if not granted
+  //     await Permission.location.request();
+  //   }
 
-    // Check if permission is still denied
-    if (await Permission.location.isDenied) {
-      // Handle the case when the user denies permission
-      print("Location permission denied");
-    } else if (await Permission.location.isPermanentlyDenied) {
-      // If the user has permanently denied the permission
-      openAppSettings(); // Optionally, open app settings to allow the user to change the permission
-    }
-  }
+  //   // Check if permission is still denied
+  //   if (await Permission.location.isDenied) {
+  //     // Handle the case when the user denies permission
+  //     print("Location permission denied");
+  //   } else if (await Permission.location.isPermanentlyDenied) {
+  //     // If the user has permanently denied the permission
+  //     openAppSettings(); // Optionally, open app settings to allow the user to change the permission
+  //   }
+  // }
 
   // void _startLocationUpdates() {
   //   _locationCheckTimer = Timer.periodic(Duration(minutes: 1), (timer) async {
@@ -136,8 +136,9 @@ class _DashboardPageState extends State<DashboardPage> {
         return false;
       }
     } else {
-      return false;
       print('the location is null');
+
+      return false;
     }
   }
 

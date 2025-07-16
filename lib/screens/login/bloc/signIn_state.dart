@@ -3,7 +3,7 @@ part of 'signIn_bloc.dart';
 @immutable
 abstract class signInState {}
 
-class signInFirstInitial extends signInState{}
+class signInFirstInitial extends signInState {}
 
 class signInInitial extends signInState {
   final String username;
@@ -20,7 +20,7 @@ class signInSuccessful extends signInState {
 }
 
 class signInError extends signInState {
-  final Exception error;
+  final BlocError error;
   signInError({
     required this.error,
   });

@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 
 class LocationService {
   static const double officeLatitude =
-      27.7400019; // Replace with your office latitude
+      37.785834; // Replace with your office latitude
   static const double officeLongitude =
-      85.3385576; // Replace with your office longitude
+      -122.406417; // Replace with your office longitude
   static const double checkRadius = 10.0; // 10 meters radius for check-in
 
   static Future<void> startLocationTracking() async {

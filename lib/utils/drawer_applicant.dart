@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:rooster_empployee/constants/appColors.dart';
 import 'package:rooster_empployee/constants/appTextStyles.dart';
 import 'package:rooster_empployee/routes/route_generator.dart';
 import 'package:rooster_empployee/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rooster_empployee/screens/Applicant/Interview%20Stages/models/userModel.dart';
 import 'package:rooster_empployee/screens/leave/presentation/leavePage.dart';
 import 'package:rooster_empployee/screens/notes/presentation/notePage.dart';
+import 'package:rooster_empployee/service/apiService.dart';
 import 'package:rooster_empployee/service/flutterSecureData.dart';
 import 'package:rooster_empployee/utils/tostMessage.dart';
 
@@ -32,19 +35,27 @@ class _DrawerWidgetApplicantState extends State<DrawerWidgetApplicant> {
   }
 
   void getUserData() async {
-    var data = await FlutterSecureData.getUserName() ?? 'name';
+    final stringUserData = await FlutterSecureData.getUserData();
 
-    var userData = await FlutterSecureData.getUserData();
-    var user = jsonDecode(userData ?? '');
-    print('the user data is $user');
-    print('the image is ${user['profileImage']}');
+    if (stringUserData != null && stringUserData.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(stringUserData);
 
-    setState(() {
-      email = user['email'];
-      name = user['firstName'];
-      image = user['profileImage'];
-      imageFile = File(user['profileImage'] ?? '');
-    });
+        // Extract first object inside `data` array
+        // final userJson = (decoded['data']['candidate'] as List).first;
+
+        final userData = CandidateResponse.fromJson(decoded);
+
+        setState(() {
+          email = userData.data.candidate.email;
+          name = userData.data.candidate.firstName;
+          // image = userData['profileImage'];
+          // imageFile = File(user['profileImage'] ?? '');
+        });
+      } catch (e) {
+        print('Invalid user data: $e');
+      }
+    }
   }
 
   @override
@@ -125,6 +136,25 @@ class _DrawerWidgetApplicantState extends State<DrawerWidgetApplicant> {
 
           ListTile(
             leading: Icon(
+              Icons.api_outlined,
+              color: AppColors.textPrimary,
+              size: 20.sp,
+            ),
+            title: Text(
+              'APPLICANT DETAILS',
+              style: AppTextStyles.bodySmall,
+            ),
+            onTap: () {
+              Navigator.of(context).push(
+                RouteGenerator().generateRoute(
+                  const RouteSettings(name: Routes.candidateDashbaord),
+                ),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: Icon(
               Icons.logout,
               color: AppColors.textPrimary,
               size: 20.sp,
@@ -133,7 +163,7 @@ class _DrawerWidgetApplicantState extends State<DrawerWidgetApplicant> {
               'LOGOUT',
               style: AppTextStyles.bodySmall,
             ),
-            onTap: () {
+            onTap: () async {
               // FlutterSecureData.deleteWholeSecureData();
               FlutterSecureData.setIsLoggedIn('false');
               FlutterSecureData.deleteIsHired();
@@ -143,6 +173,24 @@ class _DrawerWidgetApplicantState extends State<DrawerWidgetApplicant> {
                 ),
               );
               ToastMessage.showMessage("LogOut Sucessfully");
+
+              // try {
+              //   final value = await ApiService(Dio()).logout();
+              //   if (value) {
+              //     FlutterSecureData.setIsLoggedIn('false');
+              //     FlutterSecureData.deleteIsHired();
+              //     Navigator.of(context).pushReplacement(
+              //       RouteGenerator().generateRoute(
+              //         const RouteSettings(name: Routes.login),
+              //       ),
+              //     );
+              //     ToastMessage.showMessage("LogOut Sucessfully");
+              //   } else {
+              //     ToastMessage.showMessage("LogOut Failed");
+              //   }
+              // } catch (e) {
+              //   ToastMessage.showMessage("LogOut Failed");
+              // }
             },
           ),
         ],

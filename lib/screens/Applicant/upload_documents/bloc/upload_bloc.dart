@@ -1,126 +1,135 @@
+// upload_bloc.dart
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rooster_empployee/screens/Applicant/upload_documents/bloc/upload_event.dart';
+import 'package:rooster_empployee/screens/Applicant/upload_documents/bloc/upload_state.dart';
+import 'package:rooster_empployee/screens/Applicant/upload_documents/model/document_draft.dart';
 import 'package:rooster_empployee/screens/Applicant/upload_documents/model/remote_file_model.dart';
 import 'package:rooster_empployee/screens/Applicant/upload_documents/service/data_service.dart';
-import 'upload_event.dart';
-import 'upload_state.dart';
 
 class UploadBloc extends Bloc<UploadEvent, UploadState> {
-  final DocumentService _documentService = DocumentService();
+  final DocumentService documentService;
 
-  UploadBloc() : super(const UploadState()) {
+  UploadBloc({required this.documentService}) : super(const UploadState()) {
     on<LoadInitialFiles>(_onLoadInitialFiles);
-    on<FileSelected>(_onFileSelected);
-    on<SubmitDocuments>(_onSubmitDocuments);
-    on<RemoveFile>(_onRemoveFile);
-    on<RemoveRemoteFile>(_onRemoveRemoteFile);
+    on<AddDraft>(_onAddDraft);
+    on<RemoveDraft>(_onRemoveDraft);
+    on<UpdateDraftName>(_onUpdateDraftName);
+    on<SelectDraftFile>(_onSelectDraftFile);
+    on<SubmitAllDocuments>(_onSubmitAllDocuments);
+    on<DeleteRemoteFile>(_onDeleteRemoteFile);
+    on<ClearStatus>((event, emit) {
+      emit(state.copyWith(isSuccess: false, error: null, successMessage: ""));
+    });
   }
 
   Future<void> _onLoadInitialFiles(
     LoadInitialFiles event,
     Emitter<UploadState> emit,
   ) async {
+    emit(state.copyWith(isLoading: true, error: null));
+
     try {
-      final filesEvent = await _documentService.fetchUserDocuments("user_123");
+      final remoteFiles =
+          await documentService.fetchRemoteDocuments("user_123");
+      emit(state.copyWith(remoteFiles: remoteFiles, isLoading: false));
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        error: 'Failed to load documents: ${e.toString()}',
+      ));
+    }
+  }
+
+  void _onAddDraft(AddDraft event, Emitter<UploadState> emit) {
+    final updatedDrafts = List<DocumentDraft>.from(state.drafts)
+      ..add(const DocumentDraft(name: ""));
+    emit(state.copyWith(drafts: updatedDrafts));
+  }
+
+  void _onRemoveDraft(RemoveDraft event, Emitter<UploadState> emit) {
+    final updatedDrafts = List<DocumentDraft>.from(state.drafts)
+      ..removeAt(event.index);
+    emit(state.copyWith(drafts: updatedDrafts));
+  }
+
+  void _onUpdateDraftName(UpdateDraftName event, Emitter<UploadState> emit) {
+    final updatedDrafts = List<DocumentDraft>.from(state.drafts);
+    final current = updatedDrafts[event.index];
+    updatedDrafts[event.index] = current.copyWith(name: event.name);
+    emit(state.copyWith(drafts: updatedDrafts));
+  }
+
+  void _onSelectDraftFile(SelectDraftFile event, Emitter<UploadState> emit) {
+    final updatedDrafts = List<DocumentDraft>.from(state.drafts);
+    final current = updatedDrafts[event.index];
+    updatedDrafts[event.index] =
+        current.copyWith(file: event.file, isPhoto: event.isPhoto);
+    emit(state.copyWith(drafts: updatedDrafts));
+  }
+
+  Future<void> _onSubmitAllDocuments(
+    SubmitAllDocuments event,
+    Emitter<UploadState> emit,
+  ) async {
+    emit(state.copyWith(isSubmitting: true, error: null));
+
+    try {
+      final List<DocumentDraft> validDrafts =
+          state.drafts.where((d) => d.isComplete).toList();
+
+      await documentService.uploadDocuments(validDrafts);
+
+      // Re-fetch uploaded files from server after successful upload
+      // final remoteFiles =
+      //     await documentService.fetchRemoteDocuments("user_123");
 
       emit(state.copyWith(
-        remoteCV: filesEvent.remoteCV,
-        remotePhoto: filesEvent.remotePhoto,
-        remoteCoverLetter: filesEvent.remoteCoverLetter,
-        remoteCertificates: filesEvent.remoteCertificates,
-        error: null,
+        drafts: [],
+        // remoteFiles: remoteFiles,
+        successMessage: "Documents uploaded successfully",
+        isSubmitting: false,
+        isSuccess: true,
       ));
     } catch (e) {
-      emit(state.copyWith(error: 'Failed to load documents'));
-    }
-  }
-
-  Future<void> _onRemoveRemoteFile(
-      RemoveRemoteFile event, Emitter<UploadState> emit) async {
-    try {
-      await _documentService.deleteRemoteFile(event.file);
-
-      // Re-fetch updated list of files from backend
-      final updatedFiles =
-          await _documentService.fetchUserDocuments("user_123");
-
-      add(updatedFiles); // Re-dispatch to update state
-    } catch (e) {
-      emit(state.copyWith(
-          error: "Failed to delete remote file: ${e.toString()}"));
-    }
-  }
-
-  void _onFileSelected(FileSelected event, Emitter<UploadState> emit) {
-    switch (event.type) {
-      case "cv":
-        emit(state.copyWith(cv: event.files));
-        break;
-      case "photo":
-        emit(state.copyWith(photo: event.files));
-        break;
-      case "coverLetter":
-        emit(state.copyWith(coverLetter: event.files));
-        break;
-      case "certificates":
-        emit(state.copyWith(certificates: event.files));
-        break;
-    }
-  }
-
-  void _onRemoveFile(RemoveFile event, Emitter<UploadState> emit) {
-    switch (event.type) {
-      case "cv":
-        emit(state.copyWith(cv: List.from(state.cv)..remove(event.file)));
-        break;
-      case "photo":
-        emit(state.copyWith(photo: List.from(state.photo)..remove(event.file)));
-        break;
-      case "coverLetter":
-        emit(state.copyWith(
-            coverLetter: List.from(state.coverLetter)..remove(event.file)));
-        break;
-      case "certificates":
-        emit(state.copyWith(
-            certificates: List.from(state.certificates)..remove(event.file)));
-        break;
-    }
-  }
-
-  Future<void> _onSubmitDocuments(
-      SubmitDocuments event, Emitter<UploadState> emit) async {
-    emit(state.copyWith(isSubmitting: true, error: null, isSuccess: false));
-
-    try {
-      await _documentService.uploadDocuments(
-        cv: state.cv,
-        photo: state.photo,
-        coverLetter: state.coverLetter,
-        certificates: state.certificates,
-      );
-
-      emit(state.copyWith(isSubmitting: false, isSuccess: true));
-    } catch (e) {
+      print("error occured while uploading in the bloc");
       emit(state.copyWith(
         isSubmitting: false,
         isSuccess: false,
-        error: "Upload failed: ${e.toString()}",
+        error: "Upload failed",
+      ));
+    }
+  }
+
+  Future<void> _onDeleteRemoteFile(
+    DeleteRemoteFile event,
+    Emitter<UploadState> emit,
+  ) async {
+    final newDeletingSet = Set<String>.from(state.deletingFileIds)
+      ..add(event.fileId);
+    emit(state.copyWith(deletingFileIds: newDeletingSet));
+
+    try {
+      await documentService.deleteRemoteFile(event.fileId);
+
+      final updatedRemoteFiles =
+          state.remoteFiles.where((f) => f.id != event.fileId).toList();
+
+      final finalDeletingSet = Set<String>.from(state.deletingFileIds)
+        ..remove(event.fileId);
+
+      emit(state.copyWith(
+        remoteFiles: updatedRemoteFiles,
+        deletingFileIds: finalDeletingSet,
+      ));
+    } catch (e) {
+      final finalDeletingSet = Set<String>.from(state.deletingFileIds)
+        ..remove(event.fileId);
+      emit(state.copyWith(
+        deletingFileIds: finalDeletingSet,
+        error: "Failed to delete file: ${e.toString()}",
       ));
     }
   }
 }
-
-
-// class DocumentService {
-//   Future<LoadInitialFiles> fetchUserDocuments(String userId) async {
-//     final response = await http.get(Uri.parse('https://yourapi.com/user/$userId/documents'));
-
-//     final json = jsonDecode(response.body);
-
-//     return LoadInitialFiles(
-//       remoteCV: (json['cv'] as List).map((e) => RemoteFile.fromJson(e)).toList(),
-//       remotePhoto: (json['photo'] as List).map((e) => RemoteFile.fromJson(e)).toList(),
-//       remoteCoverLetter: (json['coverLetter'] as List).map((e) => RemoteFile.fromJson(e)).toList(),
-//       remoteCertificates: (json['certificates'] as List).map((e) => RemoteFile.fromJson(e)).toList(),
-//     );
-//   }}

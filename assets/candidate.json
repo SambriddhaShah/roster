@@ -1,0 +1,104 @@
+{
+  "success": true,
+  "message": "successfully fetched",
+  "data": {
+    "candidateDetails": {
+      "id": "dbf88b79-0e65-44ec-97fa-ed827a77a04e",
+      "tenantId": "517ee464-adce-4b51-9721-3ce30153d45d",
+      "jobId": "f6f227f1-b170-43b9-b21e-ea105a4439fa",
+      "firstName": "Kim",
+      "lastName": "Ball",
+      "email": "admin@dssas.com",
+      "phone": "1111111111",
+      "address": "zxZXzXzx",
+      "city": null,
+      "state": null,
+      "country": null,
+      "zip": null,
+      "resumeFileId": "29372fc4-bd40-4b1e-9fe3-84f124258fa1",
+      "coverLetterFileId": "24996036-57f2-452e-9122-68a87ba3de11",
+      "statusId": null,
+      "matchScore": null,
+      "source": null,
+      "referredBy": null,
+      "createdAt": "2025-06-11T11:23:56.941Z",
+      "updatedAt": "2025-06-11T11:23:56.940Z"
+    },
+    "formValues": [
+      {
+        "id": "85773bcf-8151-4772-8669-24b2f3be7e21",
+        "tenantId": "517ee464-adce-4b51-9721-3ce30153d45d",
+        "candidateId": "dbf88b79-0e65-44ec-97fa-ed827a77a04e",
+        "formId": "95faaf50-903a-4bdd-be6e-40621d2f6027",
+        "formElementId": "82a4786e-d571-4b01-9694-e6012ac8c4fd",
+        "formFieldValue": "621d9627-571e-4ef6-9ace-0cb26d865ecc"
+      },
+      {
+        "id": "efec0a0d-1c34-423a-bd42-0d5a3b561b21",
+        "tenantId": "517ee464-adce-4b51-9721-3ce30153d45d",
+        "candidateId": "dbf88b79-0e65-44ec-97fa-ed827a77a04e",
+        "formId": "95faaf50-903a-4bdd-be6e-40621d2f6027",
+        "formElementId": "82a4786e-d571-4b01-9694-e6012ac8c4fd",
+        "formFieldValue": "621d9627-571e-4ef6-9ace-0cb26d865ecc"
+      }
+    ],
+    "hiringStages": [
+      {
+        "id": "39048bca-004b-43b3-8a8c-6103fd4e3134",
+        "jobId": "f6f227f1-b170-43b9-b21e-ea105a4439fa",
+        "displayOrder": 0,
+        "hiringStageName": "Phone Call",
+        "statusId": "bd463adf-4912-4e7f-b021-b777eecfef6f",
+        "statusName": "selected"
+      },
+      {
+        "id": "5185d914-eab6-43bc-90c4-83787cd1657b",
+        "jobId": "f6f227f1-b170-43b9-b21e-ea105a4439fa",
+        "displayOrder": 1,
+        "hiringStageName": "First Interview",
+        "statusId": "21da738d-1a02-43c5-84ac-1544feb52f16",
+        "statusName": "in progress"
+      },
+      {
+        "id": "36a05b2e-c44e-4841-9952-b26c2379c496",
+        "jobId": "f6f227f1-b170-43b9-b21e-ea105a4439fa",
+        "displayOrder": 2,
+        "hiringStageName": "Technical/Skill Assessment",
+        "statusId": "21da738d-1a02-43c5-84ac-1544feb52f16",
+        "statusName": "in progress"
+      },
+      {
+        "id": "db57b061-b919-417b-ab2a-dce3827a5ce4",
+        "jobId": "f6f227f1-b170-43b9-b21e-ea105a4439fa",
+        "displayOrder": 3,
+        "hiringStageName": "Final Interview",
+        "statusId": "21da738d-1a02-43c5-84ac-1544feb52f16",
+        "statusName": "in progress"
+      },
+      {
+        "id": "0974bd04-eeaf-4704-b8f8-5cdf09cdc6b6",
+        "jobId": "f6f227f1-b170-43b9-b21e-ea105a4439fa",
+        "displayOrder": 4,
+        "hiringStageName": "Offer Extended",
+        "statusId": "21da738d-1a02-43c5-84ac-1544feb52f16",
+        "statusName": "in progress"
+      },
+      {
+        "id": "32d302d4-c998-4b22-902e-feae87fc8094",
+        "jobId": "f6f227f1-b170-43b9-b21e-ea105a4439fa",
+        "displayOrder": 5,
+        "hiringStageName": "Offer Accepted",
+        "statusId": "21da738d-1a02-43c5-84ac-1544feb52f16",
+        "statusName": "in progress"
+      },
+      {
+        "id": "a0e5285a-ac0b-46e6-aa15-1f669be35a66",
+        "jobId": "f6f227f1-b170-43b9-b21e-ea105a4439fa",
+        "displayOrder": 6,
+        "hiringStageName": "Onboarding",
+        "statusId": "21da738d-1a02-43c5-84ac-1544feb52f16",
+        "statusName": "in progress"
+      }
+    ]
+  }
+}

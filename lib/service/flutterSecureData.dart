@@ -16,6 +16,67 @@ class FlutterSecureData {
   static const String toDoTask = 'todoTask';
   static const String notesTasks = 'noteTasks';
   static const String isHired = "isHired";
+  static const accessToken = 'accessToken';
+  static const refreshToken = 'refreshToken';
+  static const String candidateId = 'candidateId';
+  static const String candidateJobId = "candidateJobId";
+
+  //set get and delete the access token
+  static Future<void> setAccessToken(String accessToken) {
+    return _storage.write(
+        key: FlutterSecureData.accessToken, value: accessToken);
+  }
+
+  static Future<String?> getAccessToken() {
+    return _storage.read(key: FlutterSecureData.accessToken);
+  }
+
+  static Future<void> deleteAccessToken() {
+    return _storage.delete(key: FlutterSecureData.accessToken);
+  }
+
+  //set get and delete the refresh token
+  static Future<void> setRefreshToken(String refreshToken) {
+    return _storage.write(
+        key: FlutterSecureData.refreshToken, value: refreshToken);
+  }
+
+  static Future<String?> getRefreshToken() {
+    return _storage.read(key: FlutterSecureData.refreshToken);
+  }
+
+  static Future<void> deleteRefreshToken() {
+    return _storage.delete(key: FlutterSecureData.refreshToken);
+  }
+
+// set get and delete candidteJobId
+
+  static Future<void> setCandidateJobId(String refreshToken) {
+    return _storage.write(
+        key: FlutterSecureData.candidateJobId, value: refreshToken);
+  }
+
+  static Future<String?> getCandidateJobId() {
+    return _storage.read(key: FlutterSecureData.candidateJobId);
+  }
+
+  static Future<void> deleteCandidateJobId() {
+    return _storage.delete(key: FlutterSecureData.candidateJobId);
+  }
+
+  //set get and delete the candidateId
+  static Future<void> setCandidateId(String candidateId) {
+    return _storage.write(
+        key: FlutterSecureData.candidateId, value: candidateId);
+  }
+
+  static Future<String?> getCandidateId() {
+    return _storage.read(key: FlutterSecureData.candidateId);
+  }
+
+  static Future<void> deleteCandidateId() {
+    return _storage.delete(key: FlutterSecureData.candidateId);
+  }
 
   // set get and delete the username
   static Future<void> setTodo(String data) {

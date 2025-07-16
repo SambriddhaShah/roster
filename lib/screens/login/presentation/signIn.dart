@@ -36,22 +36,24 @@ class _LoginPageState extends State<LoginPage> {
   String? sucessfulMessage;
 
   // Load saved username and password
-  void _loadUserNamePassword() async {
-    try {
-      await FlutterSecureData.getRememberMe().then((value) {
-        print('the remember value is $value');
-        setState(() {
-          _isChecked = toBoolean(value.toString());
-        });
-      });
-      if (await FlutterSecureData.getRememberMe() == "true") {
-        username.text = await FlutterSecureData.getUserName() ?? "";
-        print('the username is ${await FlutterSecureData.getUserName()}');
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
+  // void _loadUserNamePassword() async {
+  //   try {
+  //     await FlutterSecureData.getRememberMe().then((value) {
+  //       print('the remember value is $value');
+  //       setState(() {
+  //         _isChecked = toBoolean(value.toString());
+  //       });
+  //     });
+  //     if (await FlutterSecureData.getRememberMe() == "true") {
+  //       final usernameData = await FlutterSecureData.getUserName() ?? "";
+  //       setState(() {
+  //         username.text = usernameData;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   // Convert a string to a boolean value
   bool toBoolean(String string) {
@@ -108,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
           listener: (context, state) async {
             print('the state that came is $state');
             if (state is signInError) {
-              buildErrorLayout();
+              buildErrorLayout(state.error.message);
             } else if (state is signInInitial) {
               setState(() {
                 username.text = state.username;
@@ -120,13 +122,64 @@ class _LoginPageState extends State<LoginPage> {
             }
           },
           builder: (context, state) {
-            if (state is signInLoading) {
-              return buildInitialInput(contextt: context, isLoading: true);
-            } else if (state is signInInitial) {
-              return buildInitialInput(contextt: context, isLoading: false);
-            } else {
-              return buildInitialInput(contextt: context, isLoading: false);
-            }
+            return SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: Stack(children: [
+                SingleChildScrollView(
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.12,
+                        ),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.flutter_dash,
+                              size: 100.0,
+                              color: AppColors.textPrimary,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                        Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 15.h, horizontal: 10.w),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryLight,
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            width: MediaQuery.of(context).size.width,
+                            child: loginForm()),
+                        // ElevatedButton(onPressed: (){
+                        //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => OtpVerificationPage(phoneNumber: '+977-9806280992',)));
+                        // }, child: Text('Press me'))
+                      ],
+                    ),
+                  ),
+                ),
+                if (state is signInLoading) ...[
+                  LoadingWidget(child: Container())
+                ],
+              ]),
+            );
+
+            // if (state is signInLoading) {
+            //   print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            //   return buildInitialInput(contextt: context, isLoading: true);
+            // } else if (state is signInInitial) {
+            //   return buildInitialInput(contextt: context, isLoading: false);
+            // } else {
+            //   return buildInitialInput(contextt: context, isLoading: false);
+            // }
           },
         ),
       ),
@@ -188,8 +241,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // Build and display error message
-  ScaffoldFeatureController buildErrorLayout() =>
-      ToastMessage.showMessage('Invalid Username or Password');
+  ScaffoldFeatureController buildErrorLayout(String mesage) =>
+      ToastMessage.showMessage(mesage);
 
   Widget loginForm() {
     return Form(
@@ -211,7 +264,7 @@ class _LoginPageState extends State<LoginPage> {
           TextFormField(
             key: usernameKey,
             decoration: const InputDecoration(
-                label: Text('Username'), hintText: "Enter uour username"),
+                label: Text('Username'), hintText: "Enter your username"),
             controller: username,
             validator: (val) {
               if ((val == null) ||
@@ -332,18 +385,20 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _handelSucessfulLogin() {
-    if (username.text == "jondoe@gmail.com") {
-      FlutterSecureData.setIsHired(false);
-      FlutterSecureData.setIsLoggedIn('true');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => InterviewDashboardPage()),
-      );
-    } else {
-      Navigator.of(context).pushReplacement(RouteGenerator()
-          .generateRoute(const RouteSettings(name: Routes.botomNav)));
-      FlutterSecureData.setIsLoggedIn('true');
-    }
+    // if (username.text == "jondoe@gmail.com") {
+
+    FlutterSecureData.setIsLoggedIn('true');
+    // Navigator.pushReplacement(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => InterviewDashboardPage()),
+    // );
+    Navigator.of(context).pushReplacement(RouteGenerator()
+        .generateRoute(const RouteSettings(name: Routes.applicantMainPage)));
+    //   } else {
+    //     Navigator.of(context).pushReplacement(RouteGenerator()
+    //         .generateRoute(const RouteSettings(name: Routes.botomNav)));
+    //     FlutterSecureData.setIsLoggedIn('true');
+    //   }
   }
 
   void _handleRememberMe(

@@ -1,86 +1,107 @@
-import 'dart:async';
+// document_service.dart
 import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:rooster_empployee/screens/Applicant/upload_documents/model/document_draft.dart';
 import 'package:rooster_empployee/screens/Applicant/upload_documents/model/remote_file_model.dart';
-
-import '../bloc/upload_event.dart';
+import 'package:rooster_empployee/service/apiService.dart';
+import 'package:rooster_empployee/service/apiUrls.dart';
+import 'package:rooster_empployee/service/flutterSecureData.dart';
 
 class DocumentService {
-  Future<LoadInitialFiles> fetchUserDocuments(String userId) async {
-    // Simulate network latency
-    await Future.delayed(const Duration(seconds: 1));
+  final ApiService apiService;
 
-    // 🧪 MOCK DATA (easily replace this with real API call later)
-    final mockJson = {
-      "cv": [
-        // {
-        //   "id": "1",
-        //   "name": "Resume.pdf",
-        //   "url": "https://example.com/resume.pdf"
-        // }
-      ],
-      "coverLetter": [
-        // {
-        //   "id": "2",
-        //   "name": "CoverLetter.pdf",
-        //   "url": "https://example.com/coverletter.pdf"
-        // }
-      ],
-      "photo": [
-        // {
-        //   "id": "3",
-        //   "name": "Profile.jpg",
-        //   "url": "https://via.placeholder.com/150"
-        // }
-      ],
-      "certificates": [
-        // {
-        //   "id": "4",
-        //   "name": "Cert1.pdf",
-        //   "url": "https://example.com/cert1.pdf"
-        // },
-        // {"id": "5", "name": "Cert2.pdf", "url": "https://example.com/cert2.pdf"}
-      ],
-      "Transcript": []
-    };
+  DocumentService({required this.apiService});
 
-    return LoadInitialFiles(
-      remoteCV:
-          (mockJson['cv'] as List).map((e) => RemoteFile.fromJson(e)).toList(),
-      remoteCoverLetter: (mockJson['coverLetter'] as List)
-          .map((e) => RemoteFile.fromJson(e))
-          .toList(),
-      remotePhoto: (mockJson['photo'] as List)
-          .map((e) => RemoteFile.fromJson(e))
-          .toList(),
-      remoteCertificates: (mockJson['certificates'] as List)
-          .map((e) => RemoteFile.fromJson(e))
-          .toList(),
-    );
+  /// Fetch already uploaded documents
+  Future<List<RemoteFile>> fetchRemoteDocuments(String userId) async {
+    final candidateId = await FlutterSecureData.getCandidateId() ?? "";
+
+    try {
+      final response = await apiService.dio.get(
+        ApiUrl.getDocuments + candidateId,
+      );
+
+      debugPrint(
+        'Response from fetchRemoteDocuments: ${response.data}',
+        wrapWidth: 1024,
+      );
+
+      final data = response.data['data'] as List<dynamic>;
+
+      return data
+          .map((json) => RemoteFile.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  Future<void> uploadDocuments({
-    required List<File> cv,
-    required List<File> photo,
-    required List<File> coverLetter,
-    required List<File> certificates,
-  }) async {
-    // Simulate uploading
-    await Future.delayed(const Duration(seconds: 2));
+  Future<void> uploadDocuments(List<DocumentDraft> drafts) async {
+    try {
+      for (final draft in drafts) {
+        // 1. Upload the actual file
+        final file = await MultipartFile.fromFile(
+          draft.file!.path,
+          filename: draft.file!.path.split('/').last,
+        );
 
-    // 🔁 Replace this later with real API call using http or dio:
-    // final request = http.MultipartRequest('POST', Uri.parse('https://api.com/upload'));
-    // request.files.add(await http.MultipartFile.fromPath('cv', cv.first.path));
-    // ...
-    // final response = await request.send();
-    // if (response.statusCode != 200) throw Exception("Upload failed");
+        final formData = FormData.fromMap({
+          'file': file,
+        });
+
+        final uploadResponse = await apiService.dio.post(
+          ApiUrl.uploadFile,
+          data: formData,
+          options: Options(
+              contentType: 'multipart/form-data',
+              sendTimeout: Duration(minutes: 1)),
+        );
+        debugPrint('the upload respose is $uploadResponse', wrapWidth: 1024);
+
+        final filePath = uploadResponse.data['filePath'];
+        final fileId = filePath['id'];
+
+        if (fileId == null) {
+          throw Exception("File upload did not return an ID.");
+        }
+        final candidateId = await FlutterSecureData.getCandidateId();
+        final jobId = await FlutterSecureData.getCandidateJobId();
+
+        // 2. Send file metadata (filename from user input)
+        final metadataResponse = await apiService.dio.post(
+          ApiUrl.documentUpload,
+          data: {
+            "candidateId": candidateId,
+            "document": fileId,
+            "documentType": draft.name,
+            "jobId": jobId
+          },
+          options: Options(
+            headers: {'Content-Type': 'application/json'},
+          ),
+        );
+
+        if (metadataResponse.statusCode != 200 &&
+            metadataResponse.statusCode != 201) {
+          throw Exception(
+              "Metadata registration failed for file: ${draft.name}");
+        }
+      }
+    } catch (e) {
+      print("Error uploading documents: $e");
+      rethrow;
+    }
   }
 
-  Future<void> deleteRemoteFile(RemoteFile file) async {
-    // Simulate API delete call
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // In future: actual API DELETE call
-    // final response = await http.delete(Uri.parse("https://api.com/documents/${file.id}"));
-    // if (response.statusCode != 200) throw Exception("Failed to delete");
+  /// Delete a specific remote file by its ID
+  Future<void> deleteRemoteFile(String fileId) async {
+    try {
+      await apiService.dio.delete(
+        'https://api.example.com/documents/$fileId', // Replace with real
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
 }

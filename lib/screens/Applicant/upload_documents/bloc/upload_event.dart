@@ -1,58 +1,71 @@
+// upload_event.dart
 import 'dart:io';
 import 'package:equatable/equatable.dart';
-import 'package:rooster_empployee/screens/Applicant/upload_documents/model/remote_file_model.dart';
 
 abstract class UploadEvent extends Equatable {
+  const UploadEvent();
+
   @override
   List<Object?> get props => [];
 }
 
-class LoadInitialFiles extends UploadEvent {
-  final List<RemoteFile> remoteCV;
-  final List<RemoteFile> remotePhoto;
-  final List<RemoteFile> remoteCoverLetter;
-  final List<RemoteFile> remoteCertificates;
+/// Fetch remote files from API when screen is opened
+class LoadInitialFiles extends UploadEvent {}
 
-  LoadInitialFiles({
-    this.remoteCV = const [],
-    this.remotePhoto = const [],
-    this.remoteCoverLetter = const [],
-    this.remoteCertificates = const [],
+/// Add a new empty draft (with empty name and no file)
+class AddDraft extends UploadEvent {}
+
+/// Remove a draft by index (before submission)
+class RemoveDraft extends UploadEvent {
+  final int index;
+
+  const RemoveDraft(this.index);
+
+  @override
+  List<Object?> get props => [index];
+}
+
+/// Update the name (title) of a draft document
+class UpdateDraftName extends UploadEvent {
+  final int index;
+  final String name;
+
+  const UpdateDraftName({
+    required this.index,
+    required this.name,
   });
 
   @override
-  List<Object?> get props =>
-      [remoteCV, remotePhoto, remoteCoverLetter, remoteCertificates];
+  List<Object?> get props => [index, name];
 }
 
-class FileSelected extends UploadEvent {
-  final String type;
-  final List<File> files;
-
-  FileSelected(this.type, this.files);
-
-  @override
-  List<Object?> get props => [type, files];
-}
-
-class RemoveRemoteFile extends UploadEvent {
-  final String type;
-  final RemoteFile file;
-
-  RemoveRemoteFile(this.type, this.file);
-
-  @override
-  List<Object?> get props => [type, file];
-}
-
-class RemoveFile extends UploadEvent {
-  final String type;
+/// Attach a file or photo to the draft at given index
+class SelectDraftFile extends UploadEvent {
+  final int index;
   final File file;
+  final bool isPhoto;
 
-  RemoveFile(this.type, this.file);
+  const SelectDraftFile({
+    required this.index,
+    required this.file,
+    required this.isPhoto,
+  });
 
   @override
-  List<Object?> get props => [type, file];
+  List<Object?> get props => [index, file, isPhoto];
 }
 
-class SubmitDocuments extends UploadEvent {}
+/// Submit all complete drafts to the server
+class SubmitAllDocuments extends UploadEvent {}
+
+/// Delete a previously uploaded remote file (from API)
+class DeleteRemoteFile extends UploadEvent {
+  final String fileId;
+
+  const DeleteRemoteFile(this.fileId);
+
+  @override
+  List<Object?> get props => [fileId];
+}
+
+class ClearStatus extends UploadEvent {}

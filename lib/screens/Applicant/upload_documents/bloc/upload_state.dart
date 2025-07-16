@@ -1,82 +1,62 @@
-import 'dart:io';
+// upload_state.dart
 import 'package:equatable/equatable.dart';
+import 'package:rooster_empployee/screens/Applicant/upload_documents/model/document_draft.dart';
 import 'package:rooster_empployee/screens/Applicant/upload_documents/model/remote_file_model.dart';
 
 class UploadState extends Equatable {
-  final List<File> cv;
-  final List<File> photo;
-  final List<File> coverLetter;
-  final List<File> certificates;
-
-  final List<RemoteFile> remoteCV;
-  final List<RemoteFile> remotePhoto;
-  final List<RemoteFile> remoteCoverLetter;
-  final List<RemoteFile> remoteCertificates;
-
+  final List<RemoteFile> remoteFiles;
+  final List<DocumentDraft> drafts;
+  final Set<String> deletingFileIds;
   final bool isSubmitting;
+  final bool isLoading;
   final bool isSuccess;
   final String? error;
+  final String? successMessage;
 
   const UploadState({
-    this.cv = const [],
-    this.photo = const [],
-    this.coverLetter = const [],
-    this.certificates = const [],
-    this.remoteCV = const [],
-    this.remotePhoto = const [],
-    this.remoteCoverLetter = const [],
-    this.remoteCertificates = const [],
+    this.remoteFiles = const [],
+    this.drafts = const [],
+    this.deletingFileIds = const {},
     this.isSubmitting = false,
+    this.isLoading = false,
     this.isSuccess = false,
     this.error,
+    this.successMessage,
   });
 
   UploadState copyWith({
-    List<File>? cv,
-    List<File>? photo,
-    List<File>? coverLetter,
-    List<File>? certificates,
-    List<RemoteFile>? remoteCV,
-    List<RemoteFile>? remotePhoto,
-    List<RemoteFile>? remoteCoverLetter,
-    List<RemoteFile>? remoteCertificates,
+    List<RemoteFile>? remoteFiles,
+    List<DocumentDraft>? drafts,
+    Set<String>? deletingFileIds,
     bool? isSubmitting,
+    bool? isLoading,
     bool? isSuccess,
     String? error,
+    String? successMessage,
   }) {
     return UploadState(
-      cv: cv ?? this.cv,
-      photo: photo ?? this.photo,
-      coverLetter: coverLetter ?? this.coverLetter,
-      certificates: certificates ?? this.certificates,
-      remoteCV: remoteCV ?? this.remoteCV,
-      remotePhoto: remotePhoto ?? this.remotePhoto,
-      remoteCoverLetter: remoteCoverLetter ?? this.remoteCoverLetter,
-      remoteCertificates: remoteCertificates ?? this.remoteCertificates,
+      remoteFiles: remoteFiles ?? this.remoteFiles,
+      drafts: drafts ?? this.drafts,
+      deletingFileIds: deletingFileIds ?? this.deletingFileIds,
       isSubmitting: isSubmitting ?? this.isSubmitting,
+      isLoading: isLoading ?? this.isLoading,
       isSuccess: isSuccess ?? this.isSuccess,
       error: error,
+      successMessage: successMessage ?? this.successMessage,
     );
   }
 
-  bool get isAllValid =>
-      cv.isNotEmpty &&
-      photo.isNotEmpty &&
-      coverLetter.isNotEmpty &&
-      certificates.isNotEmpty;
+  bool get canSubmit => drafts.isNotEmpty && drafts.every((d) => d.isComplete);
 
   @override
   List<Object?> get props => [
-        cv,
-        photo,
-        coverLetter,
-        certificates,
-        remoteCV,
-        remotePhoto,
-        remoteCoverLetter,
-        remoteCertificates,
+        remoteFiles,
+        drafts,
+        deletingFileIds,
         isSubmitting,
+        isLoading,
         isSuccess,
         error,
+        successMessage,
       ];
 }

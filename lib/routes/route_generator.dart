@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rooster_empployee/bottomNavigation/mainPage.dart';
 import 'package:rooster_empployee/routes/routes.dart';
+import 'package:rooster_empployee/screens/Applicant/BottomTabBar/presentation/applicant_tab_bar.dart';
+import 'package:rooster_empployee/screens/Applicant/Interview%20Stages2/bloc/candidate_bloc.dart';
+import 'package:rooster_empployee/screens/Applicant/Interview%20Stages2/repositary/candidate_repositary.dart';
+import 'package:rooster_empployee/screens/Applicant/Interview%20Stages2/screen/candidate_detail_screen.dart';
 import 'package:rooster_empployee/screens/Applicant/upload_documents/bloc/upload_bloc.dart';
 import 'package:rooster_empployee/screens/Applicant/upload_documents/presentation/upload_documents_page.dart';
+import 'package:rooster_empployee/screens/Applicant/upload_documents/service/data_service.dart';
 import 'package:rooster_empployee/screens/calendar/bloc/calendar_bloc.dart';
 import 'package:rooster_empployee/screens/calendar/presentation/calendarPage.dart';
 import 'package:rooster_empployee/screens/dashboard/bloc/dashboard_bloc.dart';
@@ -40,7 +45,9 @@ class RouteGenerator {
   final HistoryBloc _historyBloc = HistoryBloc();
 
   final CalendarBloc _calendarBloc = CalendarBloc();
-  final UploadBloc _uploadBloc = UploadBloc();
+  final UploadBloc _uploadBloc = UploadBloc(
+      documentService: DocumentService(apiService: ApiService(Dio())));
+  final CandidateBloc _candidateBloc = CandidateBloc(CandidateRepository());
 
   Route<dynamic> generateRoute(RouteSettings settings) {
     final args = settings.arguments;
@@ -118,7 +125,33 @@ class RouteGenerator {
                 value: _uploadBloc,
               ),
             ],
-            child: const UploadDocumentsPage(),
+            child: const UploadDocumentsPage(
+              showBackButton: true,
+            ),
+          ),
+        );
+
+      case Routes.applicantMainPage:
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider<UploadBloc>.value(
+                value: _uploadBloc,
+              ),
+            ],
+            child: CandidateMainPage(),
+          ),
+        );
+
+      case Routes.candidateDashbaord:
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider<CandidateBloc>.value(
+                value: _candidateBloc,
+              ),
+            ],
+            child: const CandidateDetailScreen(),
           ),
         );
 

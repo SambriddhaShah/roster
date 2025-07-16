@@ -13,11 +13,11 @@ class NotiService {
   Future<void> initNotifications() async {
     if (_isInitialized) return;
 
-    // Prepare Android initialization settings
+    // Android init
     const AndroidInitializationSettings initSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    // Prepare iOS initialization settings
+    // iOS init
     const DarwinInitializationSettings initSettingsIOS =
         DarwinInitializationSettings(
       requestAlertPermission: true,
@@ -25,7 +25,7 @@ class NotiService {
       requestSoundPermission: true,
     );
 
-    // Combined initialization settings
+    // Final init
     const InitializationSettings initSettings = InitializationSettings(
       android: initSettingsAndroid,
       iOS: initSettingsIOS,
@@ -33,23 +33,69 @@ class NotiService {
 
     // Initialize the plugin
     await notificationsPlugin.initialize(initSettings);
-    notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()!
-        .requestNotificationsPermission();
 
-    // Request iOS-specific permissions
-    await notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
+    // ✅ SAFELY request Android permission
+    final androidPlugin =
+        notificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin != null) {
+      await androidPlugin.requestNotificationsPermission();
+    }
+
+    // ✅ SAFELY request iOS permission
+    final iosPlugin = notificationsPlugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    if (iosPlugin != null) {
+      await iosPlugin.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    }
 
     _isInitialized = true;
   }
+
+  // Future<void> initNotifications() async {
+  //   if (_isInitialized) return;
+
+  //   // Prepare Android initialization settings
+  //   const AndroidInitializationSettings initSettingsAndroid =
+  //       AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  //   // Prepare iOS initialization settings
+  //   const DarwinInitializationSettings initSettingsIOS =
+  //       DarwinInitializationSettings(
+  //     requestAlertPermission: true,
+  //     requestBadgePermission: true,
+  //     requestSoundPermission: true,
+  //   );
+
+  //   // Combined initialization settings
+  //   const InitializationSettings initSettings = InitializationSettings(
+  //     android: initSettingsAndroid,
+  //     iOS: initSettingsIOS,
+  //   );
+
+  //   // Initialize the plugin
+  //   await notificationsPlugin.initialize(initSettings);
+  //   notificationsPlugin
+  //       .resolvePlatformSpecificImplementation<
+  //           AndroidFlutterLocalNotificationsPlugin>()!
+  //       .requestNotificationsPermission();
+
+  //   // Request iOS-specific permissions
+  //   await notificationsPlugin
+  //       .resolvePlatformSpecificImplementation<
+  //           IOSFlutterLocalNotificationsPlugin>()
+  //       ?.requestPermissions(
+  //         alert: true,
+  //         badge: true,
+  //         sound: true,
+  //       );
+
+  //   _isInitialized = true;
+  // }
 
   /// Configure notification details
   NotificationDetails notificationDetails() {
@@ -76,12 +122,16 @@ class NotiService {
       await initNotifications(); // Ensure initialization
     }
 
-    return notificationsPlugin.show(
-      id,
-      title,
-      body,
-      notificationDetails(), // Use configured notification details
-    );
+    try {
+      return notificationsPlugin.show(
+        id,
+        title,
+        body,
+        notificationDetails(), // Use configured notification details
+      );
+    } catch (e) {
+      print('some errors in the show notification ${e}');
+    }
   }
 
   /// Show a perodic notification
