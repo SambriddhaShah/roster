@@ -317,8 +317,7 @@ class _UploadDocumentsPageState extends State<UploadDocumentsPage> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.insert_drive_file,
-                                  color: Colors.blueGrey),
+                              buildFileIcon(file.path),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
@@ -384,4 +383,58 @@ class _UploadDocumentsPageState extends State<UploadDocumentsPage> {
       },
     );
   }
+}
+
+enum FileType { image, pdf, word, excel, ppt, text, video, archive, other }
+
+FileType getFileType(String fileName) {
+  final lower = fileName.toLowerCase();
+
+  if (lower.endsWith('.jpg') ||
+      lower.endsWith('.jpeg') ||
+      lower.endsWith('.png') ||
+      lower.endsWith('.gif') ||
+      lower.endsWith('.bmp') ||
+      lower.endsWith('.webp')) return FileType.image;
+
+  if (lower.endsWith('.pdf')) return FileType.pdf;
+  if (lower.endsWith('.doc') || lower.endsWith('.docx')) return FileType.word;
+  if (lower.endsWith('.xls') || lower.endsWith('.xlsx')) return FileType.excel;
+  if (lower.endsWith('.ppt') || lower.endsWith('.pptx')) return FileType.ppt;
+  if (lower.endsWith('.txt')) return FileType.text;
+  if (lower.endsWith('.zip') || lower.endsWith('.rar')) return FileType.archive;
+  if (lower.endsWith('.mp4') ||
+      lower.endsWith('.mov') ||
+      lower.endsWith('.avi')) return FileType.video;
+
+  return FileType.other;
+}
+
+String getIconAssetForFileType(FileType type) {
+  switch (type) {
+    case FileType.image:
+      return 'assets/photo.png';
+    case FileType.pdf:
+      return 'assets/pdf.png';
+    case FileType.word:
+      return 'assets/doc.png';
+    case FileType.excel:
+      return 'assets/xls.png';
+    case FileType.ppt:
+      return 'assets/ppt.png';
+    case FileType.text:
+      return 'assets/txt-file.png';
+
+    default:
+      return 'assets/word.png';
+  }
+}
+
+Widget buildFileIcon(String filePath) {
+  return Image.asset(
+    getIconAssetForFileType(getFileType(filePath)),
+    width: 35,
+    height: 35,
+    fit: BoxFit.contain,
+  );
 }

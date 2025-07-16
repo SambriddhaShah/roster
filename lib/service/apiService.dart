@@ -176,6 +176,7 @@
 //   }
 // }
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:rooster_empployee/constants/errors.dart';
 import 'package:rooster_empployee/service/apiUrls.dart';
@@ -211,7 +212,8 @@ class ApiService {
         return handler.next(options);
       },
       onResponse: (response, handler) {
-        print('Response: ${response.statusCode} ${response.data}');
+        debugPrint('Response: ${response.statusCode} ${response.data}',
+            wrapWidth: 1024);
         return handler.next(response);
       },
       onError: (DioException error, handler) async {

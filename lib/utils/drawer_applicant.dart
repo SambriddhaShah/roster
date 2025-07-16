@@ -134,24 +134,24 @@ class _DrawerWidgetApplicantState extends State<DrawerWidgetApplicant> {
             },
           ),
 
-          ListTile(
-            leading: Icon(
-              Icons.api_outlined,
-              color: AppColors.textPrimary,
-              size: 20.sp,
-            ),
-            title: Text(
-              'APPLICANT DETAILS',
-              style: AppTextStyles.bodySmall,
-            ),
-            onTap: () {
-              Navigator.of(context).push(
-                RouteGenerator().generateRoute(
-                  const RouteSettings(name: Routes.candidateDashbaord),
-                ),
-              );
-            },
-          ),
+          // ListTile(
+          //   leading: Icon(
+          //     Icons.api_outlined,
+          //     color: AppColors.textPrimary,
+          //     size: 20.sp,
+          //   ),
+          //   title: Text(
+          //     'APPLICANT DETAILS',
+          //     style: AppTextStyles.bodySmall,
+          //   ),
+          //   onTap: () {
+          //     Navigator.of(context).push(
+          //       RouteGenerator().generateRoute(
+          //         const RouteSettings(name: Routes.candidateDashbaord),
+          //       ),
+          //     );
+          //   },
+          // ),
 
           ListTile(
             leading: Icon(

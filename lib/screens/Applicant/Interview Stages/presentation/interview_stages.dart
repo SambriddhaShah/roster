@@ -587,6 +587,7 @@
 // }
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:rooster_empployee/constants/appColors.dart';
 import 'package:rooster_empployee/constants/appTextStyles.dart';
 import 'package:rooster_empployee/constants/status.dart';
@@ -673,7 +674,8 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
             child: Column(
               children: [
                 buildUserCard(candidate, media),
-                buildJobAndStagesCard(job, stages, currentStep, media),
+                buildJobAndStagesCard(
+                    job, stages, currentStep, media, jobApplications),
               ],
             ),
           );
@@ -742,6 +744,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     List<Stage> stages,
     int currentStep,
     Size media,
+    List<JobApplication> jobApplications,
   ) {
     return Card(
       elevation: 6,
@@ -803,6 +806,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                 currentStep,
                 index != stages.length - 1,
                 media,
+                jobApplications.first.interviews,
               );
             }),
           ],
@@ -817,6 +821,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     int currentStep,
     bool showLine,
     Size media,
+    List<Interview> interviews,
   ) {
     bool expanded = _expandedStates[index];
 
@@ -892,7 +897,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                       ),
                       if (expanded) ...[
                         const SizedBox(height: 10),
-                        buildStageDetails(stage),
+                        buildStageDetails(stage, interviews),
                       ]
                     ],
                   ),
@@ -944,102 +949,207 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     );
   }
 
-  Widget buildStageDetails(Stage stage) {
+  Widget buildStageDetails(Stage stage, List<Interview> interviews) {
+    // Match interviews for the stage
+    final matchingInterviews =
+        interviews.where((i) => i.jobStageId == stage.jobStageId).toList();
+
+    String statusText = "ℹ️ Status: ${stage.statusName}";
+    Color statusColor = Colors.grey;
+
     switch (stage.statusName) {
       case CndidateStageStatus.selected:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("✅ Status: Passed"),
-            // Text("👤 Interviewer: ${stage.interviewer}"),
-            // Text("📝 Task Done: ${stage.taskDone}"),
-            // Text("💬 Comments: ${stage.comments}"),
-            Text("📝 Description: ${stage.hiringStageDescription}"),
-          ],
-        );
+      case CndidateStageStatus.hired:
+        statusText = "✅ Status: Passed";
+        statusColor = Colors.green;
+        break;
       case CndidateStageStatus.rejected:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("❌ Status: Failed"),
-            Text("📝 Description: ${stage.hiringStageDescription}"),
-            // Text("Reason: ${stage.failureReason}"),
-            // if (stage.deactivationMessage != null)
-            //   Padding(
-            //     padding: const EdgeInsets.only(top: 6),
-            //     child: Text(stage.deactivationMessage!,
-            //         style: const TextStyle(
-            //             fontWeight: FontWeight.bold, color: Colors.red)),
-            //   ),
-          ],
-        );
-      case CndidateStageStatus.upcoming:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Status: Upcoming"),
-            Text("📝 Description: ${stage.hiringStageDescription}"),
-            // Text("Reason: ${stage.failureReason}"),
-            // if (stage.deactivationMessage != null)
-            //   Padding(
-            //     padding: const EdgeInsets.only(top: 6),
-            //     child: Text(stage.deactivationMessage!,
-            //         style: const TextStyle(
-            //             fontWeight: FontWeight.bold, color: Colors.red)),
-            //   ),
-          ],
-        );
+        statusText = "❌ Status: Rejected";
+        statusColor = Colors.red;
+        break;
       case CndidateStageStatus.inProgress:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("🔄 Status: Ongoing"),
-            // Text("👤 Interviewer: ${stage.interviewer}"),
-            Text("📝 Description: ${stage.hiringStageDescription}"),
-            const SizedBox(height: 10),
-            // if (stage.type == 'virtual' && stage.meetingLink != null)
-            //   Align(
-            //     alignment: Alignment.centerRight,
-            //     child: ElevatedButton(
-            //       onPressed: () => launchUrl(Uri.parse(stage.meetingLink!)),
-            //       child: Text("Join Virtual Meeting 🎦",
-            //           style: AppTextStyles.button.copyWith(
-            //             fontSize: 14,
-            //             color: Colors.white,
-            //           )),
-            //     ),
-            //   ),
-            // if (stage.statusType == 'physical')
-            //   Align(
-            //     alignment: Alignment.centerRight,
-            //     child: ElevatedButton(
-            //       onPressed: () => launchUrl(Uri.parse(
-            //           "https://maps.google.com/?q=Interview+Location")),
-            //       child: Text("View Location 📍",
-            //           style: AppTextStyles.button.copyWith(
-            //             fontSize: 14,
-            //             color: Colors.white,
-            //           )),
-            //     ),
-            //   ),
-            // if (stage.type == 'task')
-            //   Align(
-            //     alignment: Alignment.centerRight,
-            //     child: ElevatedButton(
-            //       onPressed: () => launchUrl(Uri.parse("/path/to/task.pdf")),
-            //       child: Text("Download the Given Task",
-            //           style: AppTextStyles.button.copyWith(
-            //             fontSize: 14,
-            //             color: Colors.white,
-            //           )),
-            //     ),
-            //   ),
-          ],
-        );
-      default:
-        return const SizedBox.shrink();
+        statusText = "🔄 Status: Ongoing";
+        statusColor = Colors.blue;
+        break;
+      case CndidateStageStatus.upcoming:
+        statusText = "⏳ Status: Upcoming";
+        statusColor = Colors.orange;
+        break;
     }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(statusText,
+            style: TextStyle(fontWeight: FontWeight.bold, color: statusColor)),
+        const SizedBox(height: 6),
+        Text("📝 Description: ${stage.hiringStageDescription}"),
+        const SizedBox(height: 12),
+        if (matchingInterviews.isNotEmpty) ...[
+          const Text("🎯 Scheduled Interviews:",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          ...matchingInterviews.map((interview) {
+            return Card(
+              color: AppColors.divider,
+              margin: const EdgeInsets.only(bottom: 12),
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("🗓️ ${formatInterviewDate(interview.scheduledAt)}"),
+                    Text("📛 Round: ${interview.roundName}"),
+                    Text("📋 ${interview.roundDescription}"),
+                    Text("🧩 Mode: ${interview.interviewMode}"),
+                    if (interview.remarks != null)
+                      Text("💬 Remarks: ${interview.remarks}"),
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: () {
+                        if (interview.interviewMode == 'virtual' &&
+                            interview.meetingLink != null) {
+                          return ElevatedButton.icon(
+                            icon: const Icon(
+                              Icons.video_call,
+                              color: Colors.white,
+                            ),
+                            onPressed: () =>
+                                launchUrl(Uri.parse(interview.meetingLink!)),
+                            label: const Text(
+                              "Join Meeting",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          );
+                        } else if (interview.interviewMode == 'physical') {
+                          return ElevatedButton.icon(
+                            icon: const Icon(
+                              Icons.location_on,
+                              color: Colors.white,
+                            ),
+                            onPressed: () => launchUrl(Uri.parse(
+                                "https://maps.google.com/?q=Interview+Location")),
+                            label: const Text(
+                              "View Location",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      }(),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ],
+      ],
+    );
   }
+
+  // Widget buildStageDetails(Stage stage) {
+  //   switch (stage.statusName) {
+  //     case CndidateStageStatus.selected:
+  //       return Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text("✅ Status: Passed"),
+  //           // Text("👤 Interviewer: ${stage.interviewer}"),
+  //           // Text("📝 Task Done: ${stage.taskDone}"),
+  //           // Text("💬 Comments: ${stage.comments}"),
+  //           Text("📝 Description: ${stage.hiringStageDescription}"),
+  //         ],
+  //       );
+  //     case CndidateStageStatus.rejected:
+  //       return Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text("❌ Status: Failed"),
+  //           Text("📝 Description: ${stage.hiringStageDescription}"),
+  //           // Text("Reason: ${stage.failureReason}"),
+  //           // if (stage.deactivationMessage != null)
+  //           //   Padding(
+  //           //     padding: const EdgeInsets.only(top: 6),
+  //           //     child: Text(stage.deactivationMessage!,
+  //           //         style: const TextStyle(
+  //           //             fontWeight: FontWeight.bold, color: Colors.red)),
+  //           //   ),
+  //         ],
+  //       );
+  //     case CndidateStageStatus.upcoming:
+  //       return Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text("Status: Upcoming"),
+  //           Text("📝 Description: ${stage.hiringStageDescription}"),
+  //           // Text("Reason: ${stage.failureReason}"),
+  //           // if (stage.deactivationMessage != null)
+  //           //   Padding(
+  //           //     padding: const EdgeInsets.only(top: 6),
+  //           //     child: Text(stage.deactivationMessage!,
+  //           //         style: const TextStyle(
+  //           //             fontWeight: FontWeight.bold, color: Colors.red)),
+  //           //   ),
+  //         ],
+  //       );
+  //     case CndidateStageStatus.inProgress:
+  //       return Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text("🔄 Status: Ongoing"),
+  //           // Text("👤 Interviewer: ${stage.interviewer}"),
+  //           Text("📝 Description: ${stage.hiringStageDescription}"),
+  //           const SizedBox(height: 10),
+  //           // if (stage.type == 'virtual' && stage.meetingLink != null)
+  //           //   Align(
+  //           //     alignment: Alignment.centerRight,
+  //           //     child: ElevatedButton(
+  //           //       onPressed: () => launchUrl(Uri.parse(stage.meetingLink!)),
+  //           //       child: Text("Join Virtual Meeting 🎦",
+  //           //           style: AppTextStyles.button.copyWith(
+  //           //             fontSize: 14,
+  //           //             color: Colors.white,
+  //           //           )),
+  //           //     ),
+  //           //   ),
+  //           // if (stage.statusType == 'physical')
+  //           //   Align(
+  //           //     alignment: Alignment.centerRight,
+  //           //     child: ElevatedButton(
+  //           //       onPressed: () => launchUrl(Uri.parse(
+  //           //           "https://maps.google.com/?q=Interview+Location")),
+  //           //       child: Text("View Location 📍",
+  //           //           style: AppTextStyles.button.copyWith(
+  //           //             fontSize: 14,
+  //           //             color: Colors.white,
+  //           //           )),
+  //           //     ),
+  //           //   ),
+  //           // if (stage.type == 'task')
+  //           //   Align(
+  //           //     alignment: Alignment.centerRight,
+  //           //     child: ElevatedButton(
+  //           //       onPressed: () => launchUrl(Uri.parse("/path/to/task.pdf")),
+  //           //       child: Text("Download the Given Task",
+  //           //           style: AppTextStyles.button.copyWith(
+  //           //             fontSize: 14,
+  //           //             color: Colors.white,
+  //           //           )),
+  //           //     ),
+  //           //   ),
+  //         ],
+  //       );
+  //     default:
+  //       return const SizedBox.shrink();
+  //   }
+  // }
 
   int getCurrentStepIndex(List<Stage> stages) {
     for (int i = 0; i < stages.length; i++) {
@@ -1081,5 +1191,14 @@ class DottedLinePainter extends CustomPainter {
   @override
   bool shouldRepaint(DottedLinePainter oldDelegate) {
     return oldDelegate.height != height || oldDelegate.color != color;
+  }
+}
+
+String formatInterviewDate(String dateTimeStr) {
+  try {
+    final dateTime = DateTime.parse(dateTimeStr);
+    return DateFormat('yyyy MMM dd').format(dateTime); // e.g., 2022 Jul 12
+  } catch (_) {
+    return dateTimeStr; // fallback
   }
 }

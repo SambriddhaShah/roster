@@ -271,6 +271,8 @@ class Interview {
   final String? remarks;
   final String? meetingLink;
   final String statusId;
+  final String jobStageId; // <-- ✅ MISSING FIELD
+  final String stageName; // <-- ✅ Also present in API response
 
   Interview({
     required this.roundName,
@@ -280,6 +282,8 @@ class Interview {
     this.remarks,
     this.meetingLink,
     required this.statusId,
+    required this.jobStageId,
+    required this.stageName,
   });
 
   factory Interview.fromJson(Map<String, dynamic> json) {
@@ -291,6 +295,8 @@ class Interview {
       remarks: json['remarks'],
       meetingLink: json['meetingLink'],
       statusId: json['statusId'],
+      jobStageId: json['jobStageId'],
+      stageName: json['stageName'],
     );
   }
 }
