@@ -488,6 +488,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:rooster_empployee/constants/appColors.dart';
+import 'package:rooster_empployee/constants/appTextStyles.dart';
 import 'package:rooster_empployee/screens/Applicant/upload_documents/widgets/full_screen_image_viewer.dart';
 
 class DocumentDraftFormWidget extends StatelessWidget {
@@ -550,6 +551,19 @@ class DocumentDraftFormWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Add Document",
+                  style: AppTextStyles.headline3.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+
             /// Name input
             TextFormField(
               initialValue: name,

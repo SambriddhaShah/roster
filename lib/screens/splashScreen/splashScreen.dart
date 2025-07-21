@@ -1,68 +1,4 @@
-// import 'dart:async';
-// import 'package:flutter/material.dart';
-// import 'package:rooster_empployee/constants/appColors.dart';
-// import 'package:rooster_empployee/constants/appTextStyles.dart';
-// import 'package:rooster_empployee/routes/route_generator.dart';
-// import 'package:rooster_empployee/routes/routes.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-// class SplashScreen extends StatefulWidget {
-//   const SplashScreen({super.key});
-
-//   @override
-//   _SplashScreenState createState() => _SplashScreenState();
-// }
-
-// class _SplashScreenState extends State<SplashScreen> {
-
-//   bool isLoggedIn= false;
-
-//   @override
-//   void initState() {
-//     super.initState();
-
-//     Timer(Duration(seconds: 3), () {
-
-//       Navigator.of(context).pushReplacement(RouteGenerator()
-//           .generateRoute(const RouteSettings(name: Routes.dashboard)));
-
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: AppColors.primaryLight, // Splash screen background color
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             // Splash Screen Logo or App Name
-//            const Icon(
-//               Icons.flutter_dash,
-//               size: 100.0,
-//               color: AppColors.surface,
-//             ),
-//             SizedBox(height: 20.h),
-//             Text(
-//               'Demo App',
-//               style: AppTextStyles.headline1,
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-//   // Convert a string to a boolean value
-//   bool toBoolean(String string) {
-//     if (string == 'true') {
-//       return true;
-//     } else {
-//       return false;
-//     }
-//   }
 
 import 'dart:async';
 
@@ -145,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen>
 
             // App Name
             Text(
-              "Rooster",
+              "Roster",
               style: GoogleFonts.poppins(
                 fontSize: 32,
                 fontWeight: FontWeight.w600,
