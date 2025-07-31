@@ -1,13 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:rooster_empployee/constants/appColors.dart';
 import 'package:rooster_empployee/constants/appTextStyles.dart';
 import 'package:rooster_empployee/constants/status.dart';
 import 'package:rooster_empployee/screens/Applicant/Interview%20Stages/models/userModel.dart';
+import 'package:rooster_empployee/screens/Applicant/upload_documents/bloc/upload_bloc.dart';
 import 'package:rooster_empployee/service/apiService.dart';
+import 'package:rooster_empployee/service/apiUrls.dart';
 import 'package:rooster_empployee/service/flutterSecureData.dart';
+import 'package:rooster_empployee/utils/documentUploadDialoge.dart';
 import 'package:rooster_empployee/utils/drawer_applicant.dart';
+import 'package:rooster_empployee/utils/tostMessage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class InterviewDashboardPage extends StatefulWidget {
@@ -265,9 +270,11 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
 
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _expandedStates[index] = !_expandedStates[index];
-        });
+        isUpcoming
+            ? null
+            : setState(() {
+                _expandedStates[index] = !_expandedStates[index];
+              });
       },
       child: AnimatedSize(
         duration: const Duration(milliseconds: 300),
@@ -314,9 +321,13 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                                   fontWeight: FontWeight.w600, fontSize: 16),
                             ),
                           ),
-                          Icon(
-                            expanded ? Icons.expand_less : Icons.expand_more,
-                          ),
+                          isUpcoming
+                              ? SizedBox.shrink()
+                              : Icon(
+                                  expanded
+                                      ? Icons.expand_less
+                                      : Icons.expand_more,
+                                ),
                         ],
                       ),
                       if (expanded) ...[
@@ -401,9 +412,125 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                 style: const TextStyle(fontStyle: FontStyle.italic)),
           ),
         const SizedBox(height: 12),
-        _buildInterviewDetails(stage, interviews),
+        if (stage.statusName != CndidateStageStatus.completed &&
+            stage.statusName != CndidateStageStatus.hired &&
+            stage.statusName != CndidateStageStatus.selected &&
+            stage.statusName != CndidateStageStatus.rejected) ...[
+          _buildInterviewDetails(stage, interviews),
+          const SizedBox(height: 12),
+        ],
+
+        // Check if there are assessments in this stage
+        // if (stage.statusName != CndidateStageStatus.completed &&
+        //     stage.statusName != CndidateStageStatus.hired &&
+        //     stage.statusName != CndidateStageStatus.selected &&
+        //     stage.statusName != CndidateStageStatus.rejected) ...[
+        if (stage.assessments.isNotEmpty)
+          ...stage.assessments.map((assessment) {
+            return buildAssessmentDetails(assessment);
+          }).toList(),
+        // ]
       ],
     );
+  }
+
+  Widget buildAssessmentDetails(Assessment assessment) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              assessment.title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text("📝 Task: ${assessment.description}"),
+
+            // If there's a task file, show a button to download or view it
+            // if (assessment.taskFileId != null &&
+            //     assessment.taskFileId!.isNotEmpty)
+            ElevatedButton.icon(
+              icon: const Icon(Icons.file_download, color: Colors.white),
+              onPressed: () {
+                // Here you would handle opening or downloading the file
+                _downloadTaskFile(assessment.taskFileId!);
+              },
+              label: const Text("Download Task File"),
+            ),
+
+            // If taskFileId is null, show the option to upload a task
+            if (assessment.taskFileId == null)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.upload_file, color: Colors.white),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      insetPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 24),
+                      contentPadding: const EdgeInsets.all(0),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      content: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: BlocProvider.value(
+                          value: context.read<UploadBloc>(),
+                          child: SingleDocumentUploadDialogContent(
+                            assessmentId: assessment.id,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+
+                  // Handle file upload functionality
+                  // _uploadTaskFile(assessment);
+                },
+                label: const Text(
+                  "Upload Task File",
+                  style: TextStyle(color: AppColors.background),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+  //ame: woyeb51080@coursora.com  password:  5M04axwe9ll
+
+  Future<void> _downloadTaskFile(String fileId) async {
+    // if (await canLaunchUrl(Uri.parse('${ApiUrl.imageUrl}${fileId}'))) {
+    //   await launchUrl(Uri.parse('${ApiUrl.imageUrl}${fileId}'),
+    //       mode: LaunchMode.externalApplication);
+    // } else {
+    //   ToastMessage.showMessage('Could not launch receipt.');
+    // }
+
+    if (await canLaunchUrl(Uri.parse(
+        'https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf'))) {
+      await launchUrl(
+          Uri.parse(
+              'https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf'),
+          mode: LaunchMode.externalApplication);
+    } else {
+      ToastMessage.showMessage('Could not launch receipt.');
+    }
+    // try {
+    //   // Logic to download the file based on the fileId
+    //   final fileUrl = await ApiService(Dio()).getFileUrl(fileId);
+
+    //   if (await canLaunch(fileUrl)) {
+    //     await launch(
+    //         fileUrl); // Opens the URL (could be a PDF link or file URL)
+    //   } else {
+    //     throw 'Could not launch $fileUrl';
+    //   }
+    // } catch (e) {
+    //   print('Error downloading task file: $e');
+    // }
   }
 
   Widget _buildInterviewDetails(Stage stage, List<Interview> interviews) {

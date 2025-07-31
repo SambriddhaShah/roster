@@ -94,12 +94,69 @@ class DocumentService {
     }
   }
 
+  Future<void> uploadDocumentsother(
+      List<DocumentDraft> drafts, String assessmentId) async {
+    try {
+      for (final draft in drafts) {
+        // 1. Upload the actual file
+        final file = await MultipartFile.fromFile(
+          draft.file!.path,
+          filename: draft.file!.path.split('/').last,
+        );
+
+        final formData = FormData.fromMap({
+          'file': file,
+        });
+
+        final uploadResponse = await apiService.dio.post(
+          ApiUrl.uploadFile,
+          data: formData,
+          options: Options(
+              contentType: 'multipart/form-data',
+              sendTimeout: Duration(minutes: 1)),
+        );
+        debugPrint('the upload respose is $uploadResponse', wrapWidth: 1024);
+
+        final filePath = uploadResponse.data['filePath'];
+        final fileId = filePath['id'];
+
+        if (fileId == null) {
+          throw Exception("File upload did not return an ID.");
+        }
+        final candidateId = await FlutterSecureData.getCandidateId();
+        final jobId = await FlutterSecureData.getCandidateJobId();
+
+        // 2. Send file metadata (filename from user input)
+        // 'http://69.62.123.60:3000/api/v1/candidate/dfvdfv/assessment/vfdvdf/submit'
+        final metadataResponse = await apiService.dio.post(
+          "${ApiUrl.uplaodAssessment}$candidateId/assessment/$assessmentId/submit",
+          data: {
+            "fileId": fileId,
+          },
+          options: Options(
+            headers: {'Content-Type': 'application/json'},
+          ),
+        );
+
+        if (metadataResponse.statusCode != 200 &&
+            metadataResponse.statusCode != 201) {
+          throw Exception(
+              "Metadata registration failed for file: ${draft.name}");
+        }
+      }
+    } catch (e) {
+      print("Error uploading documents: $e");
+      rethrow;
+    }
+  }
+
   /// Delete a specific remote file by its ID
   Future<void> deleteRemoteFile(String fileId) async {
+    final candidateId = await FlutterSecureData.getCandidateId();
+
     try {
-      await apiService.dio.delete(
-        'https://api.example.com/documents/$fileId', // Replace with real
-      );
+      await apiService.dio.delete(ApiUrl.getDocuments + fileId,
+          data: {"candidateId": candidateId});
     } catch (e) {
       rethrow;
     }

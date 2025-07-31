@@ -18,6 +18,7 @@ class UploadBloc extends Bloc<UploadEvent, UploadState> {
     on<UpdateDraftName>(_onUpdateDraftName);
     on<SelectDraftFile>(_onSelectDraftFile);
     on<SubmitAllDocuments>(_onSubmitAllDocuments);
+    on<SubmitDocuments>(_onSubmitDocuments);
     on<DeleteRemoteFile>(_onDeleteRemoteFile);
     on<ClearStatus>((event, emit) {
       emit(state.copyWith(isSuccess: false, error: null, successMessage: ""));
@@ -67,6 +68,40 @@ class UploadBloc extends Bloc<UploadEvent, UploadState> {
     updatedDrafts[event.index] =
         current.copyWith(file: event.file, isPhoto: event.isPhoto);
     emit(state.copyWith(drafts: updatedDrafts));
+  }
+
+  Future<void> _onSubmitDocuments(
+    SubmitDocuments event,
+    Emitter<UploadState> emit,
+  ) async {
+    emit(state.copyWith(isSubmitting: true, error: null));
+
+    try {
+      final List<DocumentDraft> validDrafts =
+          state.drafts.where((d) => d.isComplete).toList();
+
+      await documentService.uploadDocumentsother(
+          validDrafts, event.assessmentId);
+
+      // Re-fetch uploaded files from server after successful upload
+      // final remoteFiles =
+      //     await documentService.fetchRemoteDocuments("user_123");
+
+      emit(state.copyWith(
+        drafts: [],
+        // remoteFiles: remoteFiles,
+        successMessage: "Documents uploaded successfully",
+        isSubmitting: false,
+        isSuccess: true,
+      ));
+    } catch (e) {
+      print("error occured while uploading in the bloc");
+      emit(state.copyWith(
+        isSubmitting: false,
+        isSuccess: false,
+        error: "Upload failed",
+      ));
+    }
   }
 
   Future<void> _onSubmitAllDocuments(

@@ -235,6 +235,7 @@ class Stage {
   final String hiringStageDescription;
   final String statusName;
   final String statusType;
+  final List<Assessment> assessments;
 
   Stage({
     required this.candidateStageId,
@@ -246,6 +247,7 @@ class Stage {
     required this.hiringStageDescription,
     required this.statusName,
     required this.statusType,
+    required this.assessments,
   });
 
   factory Stage.fromJson(Map<String, dynamic> json) {
@@ -259,6 +261,9 @@ class Stage {
       hiringStageDescription: json['hiringStageDescription'],
       statusName: json['statusName'],
       statusType: json['statusType'],
+      assessments: (json['assessments'] as List)
+          .map((e) => Assessment.fromJson(e))
+          .toList(),
     );
   }
 }
@@ -271,8 +276,8 @@ class Interview {
   final String? remarks;
   final String? meetingLink;
   final String statusId;
-  final String jobStageId; // <-- ✅ MISSING FIELD
-  final String stageName; // <-- ✅ Also present in API response
+  final String jobStageId;
+  final String stageName;
 
   Interview({
     required this.roundName,
@@ -297,6 +302,38 @@ class Interview {
       statusId: json['statusId'],
       jobStageId: json['jobStageId'],
       stageName: json['stageName'],
+    );
+  }
+}
+
+class Assessment {
+  final String id;
+  final String title;
+  final String description;
+  final String? taskFileId;
+  final String? statusId;
+  final String? remarks;
+  final String? statusName;
+
+  Assessment({
+    required this.id,
+    required this.title,
+    required this.description,
+    this.taskFileId,
+    this.statusId,
+    this.remarks,
+    this.statusName,
+  });
+
+  factory Assessment.fromJson(Map<String, dynamic> json) {
+    return Assessment(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      taskFileId: json['taskFileId'],
+      statusId: json['statusId'],
+      remarks: json['remarks'],
+      statusName: json['statusName'],
     );
   }
 }

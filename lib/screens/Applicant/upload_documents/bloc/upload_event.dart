@@ -58,6 +58,15 @@ class SelectDraftFile extends UploadEvent {
 /// Submit all complete drafts to the server
 class SubmitAllDocuments extends UploadEvent {}
 
+class SubmitDocuments extends UploadEvent {
+  final String assessmentId;
+
+  const SubmitDocuments({required this.assessmentId});
+
+  @override
+  List<Object?> get props => [assessmentId];
+}
+
 /// Delete a previously uploaded remote file (from API)
 class DeleteRemoteFile extends UploadEvent {
   final String fileId;

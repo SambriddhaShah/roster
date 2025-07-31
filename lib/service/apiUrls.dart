@@ -11,4 +11,5 @@ class ApiUrl {
   static const String uploadFile = "$baseUrl/candidate/file";
   static const String documentUpload = "$baseUrl/candidate/document";
   static const String getDocuments = "$baseUrl/candidate/document/";
+  static const String uplaodAssessment = "$baseUrl/candidate/";
 }

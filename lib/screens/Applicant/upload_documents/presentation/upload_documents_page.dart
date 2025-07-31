@@ -1,134 +1,3 @@
-// import 'dart:io';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:file_picker/file_picker.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:rooster_empployee/screens/Applicant/upload_documents/bloc/upload_bloc.dart';
-// import 'package:rooster_empployee/screens/Applicant/upload_documents/bloc/upload_event.dart';
-// import 'package:rooster_empployee/screens/Applicant/upload_documents/bloc/upload_state.dart';
-// import 'package:rooster_empployee/screens/Applicant/upload_documents/widgets/file_upload_title.dart';
-// import 'package:rooster_empployee/utils/tostMessage.dart';
-
-// class UploadDocumentsPage extends StatefulWidget {
-//   const UploadDocumentsPage({Key? key}) : super(key: key);
-
-//   @override
-//   State<UploadDocumentsPage> createState() => _UploadDocumentsPageState();
-// }
-
-// class _UploadDocumentsPageState extends State<UploadDocumentsPage> {
-//   @override
-//   void initState() {
-//     super.initState();
-//     context.read<UploadBloc>().add(LoadInitialFiles());
-//   }
-
-//   void _pickFile(BuildContext context, String type) async {
-//     if (type == "photo") {
-//       final ImagePicker picker = ImagePicker();
-
-//       final source = await showModalBottomSheet<ImageSource>(
-//         context: context,
-//         builder: (_) => SafeArea(
-//           child: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               ListTile(
-//                 leading: const Icon(Icons.camera_alt),
-//                 title: const Text("Take a Photo"),
-//                 onTap: () => Navigator.pop(context, ImageSource.camera),
-//               ),
-//               ListTile(
-//                 leading: const Icon(Icons.photo_library),
-//                 title: const Text("Choose from Gallery"),
-//                 onTap: () => Navigator.pop(context, ImageSource.gallery),
-//               ),
-//             ],
-//           ),
-//         ),
-//       );
-
-//       if (source != null) {
-//         final XFile? image = await picker.pickImage(source: source);
-//         if (image != null) {
-//           final file = File(image.path);
-//           context.read<UploadBloc>().add(FileSelected("photo", [file]));
-//         }
-//       }
-//     } else {
-//       // default file_picker for other types
-//       FilePickerResult? result = await FilePicker.platform.pickFiles(
-//         allowMultiple: type == 'certificates',
-//         type: FileType.custom,
-//         allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'png'],
-//       );
-
-//       if (result != null) {
-//         final files = result.paths.map((p) => File(p!)).toList();
-//         context.read<UploadBloc>().add(FileSelected(type, files));
-//       }
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text("Upload Documents")),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: BlocConsumer<UploadBloc, UploadState>(
-//           listener: (context, state) {
-//             if (state.isSuccess) {
-//               ToastMessage.showMessage("Documents uploaded successfully!");
-//             } else if (state.error != null) {
-//               ToastMessage.showMessage(state.error!);
-//             }
-//           },
-//           builder: (context, state) {
-//             if (state.categories.isEmpty &&
-//                 state.error == null &&
-//                 !state.isSubmitting) {
-//               return const Center(
-//                 child: CircularProgressIndicator(),
-//               );
-//             }
-//             return ListView(
-//               children: [
-//                 const Text(
-//                   "Please upload the following documents:",
-//                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-//                 ),
-//                 const SizedBox(height: 20),
-//                 ...state.categories.map((category) {
-//                   return FileUploadTile(
-//                     title: category.type,
-//                     fileList: category.localFiles,
-//                     remoteFileList: category.remoteFiles,
-//                     onPressed: () => _pickFile(context, category.type),
-//                   );
-//                 }),
-//                 const SizedBox(height: 30),
-//                 ElevatedButton.icon(
-//                   icon: const Icon(Icons.upload),
-//                   label: const Text("Submit"),
-//                   style: ElevatedButton.styleFrom(
-//                     minimumSize: const Size(double.infinity, 50),
-//                   ),
-//                   onPressed: state.isAllValid
-//                       ? () => context.read<UploadBloc>().add(SubmitDocuments())
-//                       : null,
-//                 ),
-//               ],
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-// upload_documents_page.dart
-// upload_documents_page.dart (SINGLE FORM MODE)
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rooster_empployee/constants/appColors.dart';
@@ -237,6 +106,7 @@ class _UploadDocumentsPageState extends State<UploadDocumentsPage> {
                 /// 📝 Single Draft Form
                 if (showForm && draft != null)
                   DocumentDraftFormWidget(
+                    shownameField: true,
                     index: 0,
                     name: draft.name,
                     file: draft.file,
@@ -325,20 +195,7 @@ class _UploadDocumentsPageState extends State<UploadDocumentsPage> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              // isDeleting
-                              //     ? const SizedBox(
-                              //         width: 20,
-                              //         height: 20,
-                              //         child: CircularProgressIndicator(
-                              //             strokeWidth: 2),
-                              //       )
-                              //     : IconButton(
-                              //         icon: const Icon(Icons.delete_forever,
-                              //             color: Colors.red),
-                              //         onPressed: () => context
-                              //             .read<UploadBloc>()
-                              //             .add(DeleteRemoteFile(file.id)),
-                              //       ),
+
                               GestureDetector(
                                 onTap: () {
                                   print("View file: ${file.path}");
@@ -353,7 +210,8 @@ class _UploadDocumentsPageState extends State<UploadDocumentsPage> {
                                 },
                                 child: const Row(
                                   children: [
-                                    Text("View",
+                                    //View
+                                    Text("",
                                         style: TextStyle(
                                             color: AppColors.primary,
                                             fontWeight: FontWeight.w500)),
@@ -369,6 +227,46 @@ class _UploadDocumentsPageState extends State<UploadDocumentsPage> {
                                   ],
                                 ),
                               ),
+
+                              isDeleting
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          color: Colors.red, strokeWidth: 2),
+                                    )
+                                  : GestureDetector(
+                                      onTap: () {
+                                        context
+                                            .read<UploadBloc>()
+                                            .add(DeleteRemoteFile(file.id));
+                                      },
+                                      child: const Row(
+                                        children: [
+                                          //delete
+                                          Text("",
+                                              style: TextStyle(
+                                                  color: AppColors.primary,
+                                                  fontWeight: FontWeight.w500)),
+                                          const SizedBox(width: 8),
+                                          Icon(Icons.delete_outline_rounded,
+                                              color: AppColors.error),
+                                          // IconButton(
+                                          //   icon: const Icon(
+                                          //       Icons.remove_red_eye_outlined,
+                                          //       color: AppColors.primary),
+                                          //   onPressed: () {},
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                              // IconButton(
+                              //   icon: const Icon(Icons.delete_forever,
+                              //       color: Colors.red),
+                              //   onPressed: () => context
+                              //       .read<UploadBloc>()
+                              //       .add(DeleteRemoteFile(file.id)),
+                              // ),
                             ],
                           ),
                         );
