@@ -132,6 +132,7 @@ class DocumentService {
           "${ApiUrl.uplaodAssessment}$candidateId/assessment/$assessmentId/submit",
           data: {
             "fileId": fileId,
+            "createdBy": candidateId,
           },
           options: Options(
             headers: {'Content-Type': 'application/json'},

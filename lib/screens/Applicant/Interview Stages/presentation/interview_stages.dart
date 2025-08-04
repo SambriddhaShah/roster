@@ -13,6 +13,7 @@ import 'package:rooster_empployee/service/flutterSecureData.dart';
 import 'package:rooster_empployee/utils/documentUploadDialoge.dart';
 import 'package:rooster_empployee/utils/drawer_applicant.dart';
 import 'package:rooster_empployee/utils/tostMessage.dart';
+import 'package:rooster_empployee/utils/webView.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class InterviewDashboardPage extends StatefulWidget {
@@ -412,13 +413,13 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                 style: const TextStyle(fontStyle: FontStyle.italic)),
           ),
         const SizedBox(height: 12),
-        if (stage.statusName != CndidateStageStatus.completed &&
-            stage.statusName != CndidateStageStatus.hired &&
-            stage.statusName != CndidateStageStatus.selected &&
-            stage.statusName != CndidateStageStatus.rejected) ...[
-          _buildInterviewDetails(stage, interviews),
-          const SizedBox(height: 12),
-        ],
+        // if (stage.statusName != CndidateStageStatus.completed &&
+        //     stage.statusName != CndidateStageStatus.hired &&
+        //     stage.statusName != CndidateStageStatus.selected &&
+        //     stage.statusName != CndidateStageStatus.rejected) ...[
+        _buildInterviewDetails(stage, interviews),
+        const SizedBox(height: 12),
+        // ],
 
         // Check if there are assessments in this stage
         // if (stage.statusName != CndidateStageStatus.completed &&
@@ -450,19 +451,20 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
             Text("📝 Task: ${assessment.description}"),
 
             // If there's a task file, show a button to download or view it
-            // if (assessment.taskFileId != null &&
-            //     assessment.taskFileId!.isNotEmpty)
-            ElevatedButton.icon(
-              icon: const Icon(Icons.file_download, color: Colors.white),
-              onPressed: () {
-                // Here you would handle opening or downloading the file
-                _downloadTaskFile(assessment.taskFileId!);
-              },
-              label: const Text("Download Task File"),
-            ),
+            if (assessment.taskFileId != null &&
+                assessment.taskFileId!.isNotEmpty)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.file_download, color: Colors.white),
+                onPressed: () {
+                  // Here you would handle opening or downloading the file
+                  _downloadTaskFile(assessment.taskFile!.path!);
+                },
+                label: const Text("Download Task File",
+                    style: TextStyle(color: Colors.white)),
+              ),
 
             // If taskFileId is null, show the option to upload a task
-            if (assessment.taskFileId == null)
+            if (assessment.submittedFile == null)
               ElevatedButton.icon(
                 icon: const Icon(Icons.upload_file, color: Colors.white),
                 onPressed: () {
@@ -494,6 +496,27 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                   style: TextStyle(color: AppColors.background),
                 ),
               ),
+
+            if (assessment.submittedFile != null &&
+                assessment.submittedFile!.path != null &&
+                assessment.submittedFile!.path!.isNotEmpty) ...[
+              ElevatedButton.icon(
+                icon: const Icon(Icons.file_download, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => InAppWebViewPage(
+                        url:
+                            '${ApiUrl.imageUrl}${assessment.submittedFile!.path}',
+                      ),
+                    ),
+                  );
+                },
+                label: const Text("Download Task File",
+                    style: TextStyle(color: Colors.white)),
+              ),
+            ]
           ],
         ),
       ),
@@ -509,11 +532,8 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     //   ToastMessage.showMessage('Could not launch receipt.');
     // }
 
-    if (await canLaunchUrl(Uri.parse(
-        'https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf'))) {
-      await launchUrl(
-          Uri.parse(
-              'https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf'),
+    if (await canLaunchUrl(Uri.parse('${ApiUrl.imageUrl}$fileId'))) {
+      await launchUrl(Uri.parse('${ApiUrl.imageUrl}$fileId'),
           mode: LaunchMode.externalApplication);
     } else {
       ToastMessage.showMessage('Could not launch receipt.');
@@ -732,6 +752,24 @@ _StageVisuals _getStageVisuals(Stage stage) {
       );
 
     case CndidateStageStatus.inProgress:
+      return _StageVisuals(
+        circleColor: Colors.blue,
+        iconColor: Colors.blue,
+        icon: Icons.hourglass_top_rounded,
+        lineColor: Colors.grey.shade400,
+        circleChild: Text(
+          '${stage.jobStageOrder + 1}',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        statusText: 'In Progress 🔄',
+        textColor: Colors.white,
+      );
+
+    case CndidateStageStatus.in_Progress:
       return _StageVisuals(
         circleColor: Colors.blue,
         iconColor: Colors.blue,

@@ -314,6 +314,8 @@ class Assessment {
   final String? statusId;
   final String? remarks;
   final String? statusName;
+  final TaskFile? taskFile;
+  final SubmittedFile? submittedFile;
 
   Assessment({
     required this.id,
@@ -323,6 +325,8 @@ class Assessment {
     this.statusId,
     this.remarks,
     this.statusName,
+    this.taskFile,
+    this.submittedFile,
   });
 
   factory Assessment.fromJson(Map<String, dynamic> json) {
@@ -334,6 +338,63 @@ class Assessment {
       statusId: json['statusId'],
       remarks: json['remarks'],
       statusName: json['statusName'],
+      taskFile:
+          json['taskFile'] != null ? TaskFile.fromJson(json['taskFile']) : null,
+      submittedFile: json['submittedFile'] != null
+          ? SubmittedFile.fromJson(json['submittedFile'])
+          : null,
+    );
+  }
+}
+
+class TaskFile {
+  final String? id;
+  final String? name;
+  final String? path;
+  final int? size;
+  final String? mimeType;
+
+  TaskFile({
+    required this.id,
+    required this.name,
+    required this.path,
+    required this.size,
+    required this.mimeType,
+  });
+
+  factory TaskFile.fromJson(Map<String, dynamic> json) {
+    return TaskFile(
+      id: json['id'],
+      name: json['name'],
+      path: json['path'],
+      size: json['size'],
+      mimeType: json['mimeType'],
+    );
+  }
+}
+
+class SubmittedFile {
+  final String? id;
+  final String? name;
+  final String? path;
+  final int? size;
+  final String? mimeType;
+
+  SubmittedFile({
+    required this.id,
+    required this.name,
+    required this.path,
+    required this.size,
+    required this.mimeType,
+  });
+
+  factory SubmittedFile.fromJson(Map<String, dynamic> json) {
+    return SubmittedFile(
+      id: json['id'],
+      name: json['name'],
+      path: json['path'],
+      size: json['size'],
+      mimeType: json['mimeType'],
     );
   }
 }
