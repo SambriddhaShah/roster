@@ -37,6 +37,60 @@ class DocumentService {
     }
   }
 
+  Future<void> uploadOfferLetter(
+      List<DocumentDraft> drafts, String offerLetterId) async {
+    try {
+      for (final draft in drafts) {
+        // 1. Upload the actual file
+        final file = await MultipartFile.fromFile(
+          draft.file!.path,
+          filename: draft.file!.path.split('/').last,
+        );
+
+        final formData = FormData.fromMap({
+          'file': file,
+        });
+
+        final uploadResponse = await apiService.dio.post(
+          ApiUrl.uploadFile,
+          data: formData,
+          options: Options(
+              contentType: 'multipart/form-data',
+              sendTimeout: Duration(minutes: 1)),
+        );
+        debugPrint('the upload respose is $uploadResponse', wrapWidth: 1024);
+
+        final filePath = uploadResponse.data['filePath'];
+        final fileId = filePath['id'];
+
+        if (fileId == null) {
+          throw Exception("File upload did not return an ID.");
+        }
+        final candidateId = await FlutterSecureData.getCandidateId();
+        final jobId = await FlutterSecureData.getCandidateJobId();
+
+        // 2. Send file metadata (filename from user input)
+        // 'http://69.62.123.60:3000/api/v1/candidate/dfvdfv/assessment/vfdvdf/submit'
+        final metadataResponse = await apiService.dio.patch(
+          ApiUrl.uploadOfferLetter + offerLetterId,
+          data: {"candidateId": candidateId, "acceptedLetter": fileId},
+          options: Options(
+            headers: {'Content-Type': 'application/json'},
+          ),
+        );
+
+        if (metadataResponse.statusCode != 200 &&
+            metadataResponse.statusCode != 201) {
+          throw Exception(
+              "Metadata registration failed for file: ${draft.name}");
+        }
+      }
+    } catch (e) {
+      print("Error uploading documents: $e");
+      rethrow;
+    }
+  }
+
   Future<void> uploadDocuments(List<DocumentDraft> drafts) async {
     try {
       for (final draft in drafts) {

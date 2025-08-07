@@ -413,25 +413,133 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                 style: const TextStyle(fontStyle: FontStyle.italic)),
           ),
         const SizedBox(height: 12),
-        // if (stage.statusName != CndidateStageStatus.completed &&
-        //     stage.statusName != CndidateStageStatus.hired &&
-        //     stage.statusName != CndidateStageStatus.selected &&
-        //     stage.statusName != CndidateStageStatus.rejected) ...[
-        _buildInterviewDetails(stage, interviews),
-        const SizedBox(height: 12),
-        // ],
+        if (stage.statusName != CndidateStageStatus.completed &&
+            stage.statusName != CndidateStageStatus.hired &&
+            stage.statusName != CndidateStageStatus.selected &&
+            stage.statusName != CndidateStageStatus.rejected) ...[
+          _buildInterviewDetails(stage, interviews),
+          const SizedBox(height: 12),
+        ],
 
         // Check if there are assessments in this stage
-        // if (stage.statusName != CndidateStageStatus.completed &&
-        //     stage.statusName != CndidateStageStatus.hired &&
-        //     stage.statusName != CndidateStageStatus.selected &&
-        //     stage.statusName != CndidateStageStatus.rejected) ...[
-        if (stage.assessments.isNotEmpty)
-          ...stage.assessments.map((assessment) {
-            return buildAssessmentDetails(assessment);
-          }).toList(),
-        // ]
+        if (stage.statusName != CndidateStageStatus.completed &&
+            stage.statusName != CndidateStageStatus.hired &&
+            stage.statusName != CndidateStageStatus.selected &&
+            stage.statusName != CndidateStageStatus.rejected) ...[
+          if (stage.assessments.isNotEmpty)
+            ...stage.assessments.map((assessment) {
+              return buildAssessmentDetails(assessment);
+            }).toList(),
+        ],
+
+        if (stage.hiringStageName == "Offer Letter") ...[
+          // Check if there are assessments in this stage
+          if (stage.statusName != CndidateStageStatus.completed &&
+              stage.statusName != CndidateStageStatus.hired &&
+              stage.statusName != CndidateStageStatus.selected &&
+              stage.statusName != CndidateStageStatus.rejected) ...[
+            if (stage.offerLetter != null && stage.offerLetter!.id != null) ...[
+              buildOfferLetterDetails(stage.offerLetter!)
+            ]
+            // ...stage.assessments.map((assessment) {
+            //   return buildAssessmentDetails(assessment);
+            // }).toList(),
+          ]
+        ]
       ],
+    );
+  }
+
+  Widget buildOfferLetterDetails(OfferLetter offerLetter) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "offer letter",
+              // offerLetter.title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            // Text("📝 Task: ${assessment.description}"),
+
+            // If there's a task file, show a button to download or view it
+            if (offerLetter.offerLetterFileId != null &&
+                offerLetter.offerLetterFilePath!.isNotEmpty)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.file_download, color: Colors.white),
+                onPressed: () {
+                  // Here you would handle opening or downloading the file
+                  _downloadTaskFile(offerLetter.offerLetterFilePath!);
+                },
+                label: const Text("Download Offer Letter",
+                    style: TextStyle(color: Colors.white, fontSize: 12)),
+              ),
+
+            // If taskFileId is null, show the option to upload a task
+            if (offerLetter.acceptedLetter == null)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.upload_file, color: Colors.white),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      insetPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 24),
+                      contentPadding: const EdgeInsets.all(0),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      content: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: BlocProvider.value(
+                          value: context.read<UploadBloc>(),
+                          child: SingleDocumentUploadDialogContent(
+                            assessmentId: offerLetter.id,
+                            isOffer: true,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+
+                  // Handle file upload functionality
+                  // _uploadTaskFile(assessment);
+                  setState(() {
+                    _futureData = loadJsonData();
+                  });
+                },
+                label: const Text(
+                  "Upload Offer letter",
+                  style: TextStyle(color: AppColors.background, fontSize: 12),
+                ),
+              ),
+
+            if (offerLetter.acceptedLetter != null &&
+                offerLetter.acceptedLetterFilePath != null) ...[
+              ElevatedButton.icon(
+                icon: const Icon(Icons.remove_red_eye_outlined,
+                    color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => InAppWebViewPage(
+                        url:
+                            '${ApiUrl.imageUrl}${offerLetter.acceptedLetterFilePath}',
+                      ),
+                    ),
+                  );
+                },
+                label: const Text("Submitted Offer letter",
+                    style: TextStyle(color: Colors.white, fontSize: 12)),
+              ),
+            ]
+          ],
+        ),
+      ),
     );
   }
 
@@ -460,11 +568,13 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                   _downloadTaskFile(assessment.taskFile!.path!);
                 },
                 label: const Text("Download Task File",
-                    style: TextStyle(color: Colors.white)),
+                    style: TextStyle(color: Colors.white, fontSize: 12)),
               ),
 
             // If taskFileId is null, show the option to upload a task
-            if (assessment.submittedFile == null)
+            if (assessment.submittedFile == null ||
+                assessment.submittedFile!.path == null ||
+                assessment.submittedFile!.path!.isEmpty)
               ElevatedButton.icon(
                 icon: const Icon(Icons.upload_file, color: Colors.white),
                 onPressed: () {
@@ -482,6 +592,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                           value: context.read<UploadBloc>(),
                           child: SingleDocumentUploadDialogContent(
                             assessmentId: assessment.id,
+                            isOffer: false,
                           ),
                         ),
                       ),
@@ -490,10 +601,13 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
 
                   // Handle file upload functionality
                   // _uploadTaskFile(assessment);
+                  setState(() {
+                    _futureData = loadJsonData();
+                  });
                 },
                 label: const Text(
                   "Upload Task File",
-                  style: TextStyle(color: AppColors.background),
+                  style: TextStyle(color: AppColors.background, fontSize: 12),
                 ),
               ),
 
@@ -501,7 +615,8 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                 assessment.submittedFile!.path != null &&
                 assessment.submittedFile!.path!.isNotEmpty) ...[
               ElevatedButton.icon(
-                icon: const Icon(Icons.file_download, color: Colors.white),
+                icon: const Icon(Icons.remove_red_eye_outlined,
+                    color: Colors.white),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -513,8 +628,8 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                     ),
                   );
                 },
-                label: const Text("Download Task File",
-                    style: TextStyle(color: Colors.white)),
+                label: const Text("View Submitted File",
+                    style: TextStyle(color: Colors.white, fontSize: 12)),
               ),
             ]
           ],

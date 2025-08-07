@@ -67,6 +67,17 @@ class SubmitDocuments extends UploadEvent {
   List<Object?> get props => [assessmentId];
 }
 
+//submit offer letter
+
+class SubmitOfferLetter extends UploadEvent {
+  final String offerLetterId;
+
+  const SubmitOfferLetter({required this.offerLetterId});
+
+  @override
+  List<Object?> get props => [offerLetterId];
+}
+
 /// Delete a previously uploaded remote file (from API)
 class DeleteRemoteFile extends UploadEvent {
   final String fileId;

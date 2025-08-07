@@ -236,7 +236,7 @@ class Stage {
   final String statusName;
   final String statusType;
   final List<Assessment> assessments;
-
+  final OfferLetter? offerLetter;
   Stage({
     required this.candidateStageId,
     required this.jobStageId,
@@ -248,6 +248,7 @@ class Stage {
     required this.statusName,
     required this.statusType,
     required this.assessments,
+    this.offerLetter,
   });
 
   factory Stage.fromJson(Map<String, dynamic> json) {
@@ -264,6 +265,9 @@ class Stage {
       assessments: (json['assessments'] as List)
           .map((e) => Assessment.fromJson(e))
           .toList(),
+      offerLetter: json['offerLetter'] != null
+          ? OfferLetter.fromJson(json['offerLetter'])
+          : null,
     );
   }
 }
@@ -398,3 +402,38 @@ class SubmittedFile {
     );
   }
 }
+
+class OfferLetter {
+  final String id;
+  final String title;
+  final String? offerLetterFileId;
+  final String? offerLetterFilePath;
+  final String? offerLetterFileName;
+  final String? acceptedLetter;
+  final String? acceptedLetterFilePath;
+
+  OfferLetter(
+      {required this.id,
+      required this.title,
+      this.offerLetterFileId,
+      this.offerLetterFilePath,
+      this.offerLetterFileName,
+      this.acceptedLetter,
+      this.acceptedLetterFilePath});
+
+  factory OfferLetter.fromJson(Map<String, dynamic> json) {
+    return OfferLetter(
+      id: json['id'],
+      title: json['title'],
+      offerLetterFileId: json['offerLetterFileId'],
+      offerLetterFilePath: json['offerLetterFilePath'],
+      offerLetterFileName: json['offerLetterFileName'],
+      acceptedLetter: json['acceptedLetter'],
+      acceptedLetterFilePath: json['acceptedLetterFilePath'],
+    );
+  }
+}
+
+
+
+//  {id: f9fc1aa5-060a-426a-974e-e282f9545556, title: Offer Letter, offerLetterFileId: 17e13d18-8f67-4ebc-96a9-9bf1737fdf1c, offerLetterFilePath: /uploads/cfd291c3-cf2e-49ee-b480-d4d66eefd241/documents/1754561375357-c3e22729-00d6-4f14-8345-6111510102a4-sample_local_pdf.pdf, offerLetterFileName: sample-local-pdf.pdf}

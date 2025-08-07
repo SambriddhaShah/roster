@@ -9,8 +9,9 @@ import 'package:rooster_empployee/utils/tostMessage.dart';
 
 class SingleDocumentUploadDialogContent extends StatefulWidget {
   final String assessmentId;
+  final bool isOffer;
   const SingleDocumentUploadDialogContent(
-      {super.key, required this.assessmentId});
+      {super.key, required this.assessmentId, required this.isOffer});
 
   @override
   State<SingleDocumentUploadDialogContent> createState() =>
@@ -78,9 +79,13 @@ class _SingleDocumentUploadDialogContentState
             Navigator.of(context).pop();
           },
           onSubmit: () {
-            context
-                .read<UploadBloc>()
-                .add(SubmitDocuments(assessmentId: widget.assessmentId));
+            widget.isOffer == true
+                ? context
+                    .read<UploadBloc>()
+                    .add(SubmitOfferLetter(offerLetterId: widget.assessmentId))
+                : context
+                    .read<UploadBloc>()
+                    .add(SubmitDocuments(assessmentId: widget.assessmentId));
           },
         );
       },
