@@ -39,7 +39,7 @@ class UploadBloc extends Bloc<UploadEvent, UploadState> {
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
-        error: 'Failed to load documents: ${e.toString()}',
+        error: 'Failed to load documents',
       ));
     }
   }
@@ -197,7 +197,7 @@ class UploadBloc extends Bloc<UploadEvent, UploadState> {
         ..remove(event.fileId);
       emit(state.copyWith(
         deletingFileIds: finalDeletingSet,
-        error: "Failed to delete file: ${e.toString()}",
+        error: "Failed to delete file",
       ));
     }
   }

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -49,13 +50,13 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
       if (jobApplications.isNotEmpty) {
         // Sort stages by jobStageOrder before creating expanded states
         final sortedStages = [...jobApplications.first.stages]
-          ..sort((a, b) => a.jobStageOrder.compareTo(b.jobStageOrder));
+          ..sort((a, b) => a.jobStageOrder!.compareTo(b.jobStageOrder!));
         _expandedStates = List.filled(sortedStages.length, false);
       }
 
       return data;
     } catch (e) {
-      print('Error loading candidate data: $e');
+      debugPrint('Error loading candidate data: $e');
       return null;
     }
   }
@@ -65,8 +66,11 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     final media = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Dashboard")),
-      drawer: DrawerWidgetApplicant(),
+      appBar: AppBar(
+        title: const Text("Dashboard"),
+        centerTitle: true,
+      ),
+      drawer: const DrawerWidgetApplicant(),
       body: FutureBuilder<CandidateResponse?>(
         future: _futureData,
         builder: (context, snapshot) {
@@ -93,10 +97,17 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 buildUserCard(candidate, media),
+                const SizedBox(height: 16),
                 buildJobAndStagesCard(
-                    job, stages, currentStep, media, jobApplications),
+                  job,
+                  stages,
+                  currentStep,
+                  media,
+                  jobApplications,
+                ),
               ],
             ),
           );
@@ -105,52 +116,44 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     );
   }
 
+  // --------------------------
+  // Premium UI — USER CARD
+  // --------------------------
   Widget buildUserCard(Candidate candidate, Size media) {
     return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      margin: const EdgeInsets.only(bottom: 20),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+        padding: const EdgeInsets.all(20),
         child: Row(
           children: [
             CircleAvatar(
-              radius: media.width * 0.08,
+              radius: media.width * 0.10,
               backgroundColor: AppColors.primary,
               child: Text(
                 '${candidate.firstName[0]}${candidate.lastName[0]}'
                     .toUpperCase(),
-                style: TextStyle(
-                  fontSize: media.width * 0.07,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.headline2.copyWith(color: Colors.white),
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${candidate.firstName} ${candidate.lastName}',
-                      style: TextStyle(
-                          fontSize: media.width * 0.06,
-                          fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
                   Text(
-                    '📧 ${candidate.email}',
+                    '${candidate.firstName} ${candidate.lastName}',
+                    style: AppTextStyles.headline2,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Text(
-                    '🏠 ${candidate.address}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    '📱 ${candidate.phone}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  const SizedBox(height: 8),
+                  _infoLine(
+                      icon: Icons.alternate_email, label: candidate.email),
+                  _infoLine(
+                      icon: Icons.home_outlined, label: candidate.address),
+                  _infoLine(icon: Icons.phone_rounded, label: candidate.phone),
                 ],
               ),
             ),
@@ -160,6 +163,30 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     );
   }
 
+  Widget _infoLine({required IconData icon, required String label}) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: AppColors.icon),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              style: AppTextStyles.bodySmall,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --------------------------------------
+  // Premium UI — JOB & STAGES CARD
+  // --------------------------------------
   Widget buildJobAndStagesCard(
     Job job,
     List<Stage> stages,
@@ -167,43 +194,38 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     Size media,
     List<JobApplication> jobApplications,
   ) {
-    // Sort stages by jobStageOrder before displaying
     final sortedStages = [...stages]
-      ..sort((a, b) => a.jobStageOrder.compareTo(b.jobStageOrder));
+      ..sort((a, b) => a.jobStageOrder!.compareTo(b.jobStageOrder!));
 
     return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 2,
+      shadowColor: AppColors.border,
+      color: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              job.title,
-              style: TextStyle(
-                fontSize: media.width * 0.05,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
+            Text(job.title ?? '',
+                style: AppTextStyles.headline2,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 12),
+
+            // Job Description Toggle
             InkWell(
-              onTap: () {
-                setState(() => _showFullJobDesc = !_showFullJobDesc);
-              },
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => setState(() => _showFullJobDesc = !_showFullJobDesc),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    "Description",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-                  ),
+                  Text('Description', style: AppTextStyles.bodyLarge),
                   const SizedBox(width: 6),
                   Icon(
-                    _showFullJobDesc
-                        ? Icons.keyboard_arrow_up
-                        : Icons.keyboard_arrow_down,
-                    size: 24,
-                  ),
+                    _showFullJobDesc ? Icons.expand_less : Icons.expand_more,
+                    color: AppColors.icon,
+                  )
                 ],
               ),
             ),
@@ -211,19 +233,21 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
               crossFadeState: _showFullJobDesc
                   ? CrossFadeState.showSecond
                   : CrossFadeState.showFirst,
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 250),
               firstChild: const SizedBox.shrink(),
               secondChild: Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(job.description),
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  job.description ?? '',
+                  style: AppTextStyles.bodySmall,
+                ),
               ),
             ),
+
             const SizedBox(height: 20),
-            Text("📌 Hiring Stages",
-                style: TextStyle(
-                    fontSize: media.width * 0.045,
-                    fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+            Text('📌 Hiring Stages', style: AppTextStyles.headline4),
+            const SizedBox(height: 12),
+
             ...List.generate(sortedStages.length, (index) {
               return buildCustomExpandableStageCard(
                 sortedStages[index],
@@ -240,6 +264,9 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     );
   }
 
+  // -------------------------------------------------
+  // Premium UI — EXPANDABLE STAGE ITEM (timeline feel)
+  // -------------------------------------------------
   Widget buildCustomExpandableStageCard(
     Stage stage,
     int index,
@@ -248,130 +275,93 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     Size media,
     List<Interview> interviews,
   ) {
-    bool expanded = _expandedStates[index];
+    final bool expanded = _expandedStates[index];
 
-    // Status determination
-    bool isCompleted = stage.statusName == CndidateStageStatus.selected ||
-            stage.statusName == CndidateStageStatus.hired ||
-            CndidateStageStatus.completed == stage.statusName
-        // ||
-        // stage.jobStageOrder < currentStep
-        ;
     final visuals = _getStageVisuals(stage);
 
-    bool isCurrent = stage.statusName == CndidateStageStatus.inProgress
-        // ||
-        //     stage.jobStageOrder == currentStep
-        ;
-
-    bool isUpcoming = stage.statusName == CndidateStageStatus.upcoming ||
-        stage.jobStageOrder > currentStep;
-
-    bool isRejected = stage.statusName == CndidateStageStatus.rejected;
+    final bool isUpcoming = stage.statusName == CndidateStageStatus.upcoming ||
+        stage.jobStageOrder! > currentStep;
 
     return GestureDetector(
       onTap: () {
-        isUpcoming
-            ? null
-            : setState(() {
-                _expandedStates[index] = !_expandedStates[index];
-              });
+        if (!isUpcoming) {
+          setState(() => _expandedStates[index] = !_expandedStates[index]);
+        }
       },
-      child: AnimatedSize(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOutCubic,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        margin: const EdgeInsets.only(left: 40, bottom: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Container(
-              margin: const EdgeInsets.only(left: 40),
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                margin: const EdgeInsets.symmetric(vertical: 16),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
+            // Content Card
+            Card(
+              elevation: 1.5,
+              shadowColor: AppColors.border,
+              color: AppColors.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(visuals.icon, color: visuals.iconColor),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            stage.hiringStageName ?? '',
+                            style: AppTextStyles.bodyLarge,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (!isUpcoming)
                           Icon(
-                            visuals.icon,
-                            // isRejected
-                            //     ? Icons.cancel_outlined
-                            //     : isCompleted
-                            //         ? Icons.check_circle_outline
-                            //         : isCurrent
-                            //             ? Icons.hourglass_top_rounded
-                            //             : Icons.access_time,
-                            color: visuals.iconColor,
-                            // isRejected
-                            //     ? Colors.red
-                            //     : isCompleted
-                            //         ? Colors.green
-                            //         : isCurrent
-                            //             ? Colors.blue
-                            //             : Colors.orange,
+                            expanded ? Icons.expand_less : Icons.expand_more,
+                            color: AppColors.icon,
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              stage.hiringStageName,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 16),
-                            ),
-                          ),
-                          isUpcoming
-                              ? SizedBox.shrink()
-                              : Icon(
-                                  expanded
-                                      ? Icons.expand_less
-                                      : Icons.expand_more,
-                                ),
-                        ],
-                      ),
-                      if (expanded) ...[
-                        const SizedBox(height: 10),
-                        buildStageDetails(stage, interviews),
-                      ]
+                      ],
+                    ),
+                    if (expanded) ...[
+                      const SizedBox(height: 10),
+                      buildStageDetails(stage, interviews),
                     ],
-                  ),
+                  ],
                 ),
               ),
             ),
+
+            // Timeline Dot + Connector
             Positioned(
-              top: 27,
-              left: 0,
+              top: 16,
+              left: -40,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircleAvatar(
-                    radius: 17,
-                    backgroundColor: visuals.circleColor
-                    // isRejected
-                    //     ? Colors.red
-                    //     : isCompleted
-                    //         ? Colors.green
-                    //         : isCurrent
-                    //             ? Colors.blue
-                    //             : Colors.grey.shade300
-                    ,
-                    child: isRejected
-                        ? const Icon(Icons.close, size: 16, color: Colors.white)
-                        : isCompleted
-                            ? const Icon(Icons.check,
-                                size: 16, color: Colors.white)
-                            : Text(
-                                '${index + 1}',
-                                style: TextStyle(
-                                  color: visuals.textColor
-                                  // isCurrent ? Colors.white : Colors.black
-                                  ,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: visuals.circleColor,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: visuals.circleColor.withOpacity(0.25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Center(child: visuals.circleChild),
                   ),
                   if (showLine)
                     SizedBox(
@@ -379,9 +369,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                       child: CustomPaint(
                         painter: DottedLinePainter(
                           height: expanded ? 160 : 40,
-                          color: visuals.iconColor
-                          // isCompleted ? Colors.green : Colors.grey.shade400
-                          ,
+                          color: visuals.iconColor,
                         ),
                       ),
                     ),
@@ -396,23 +384,36 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
 
   Widget buildStageDetails(Stage stage, List<Interview> interviews) {
     final visuals = _getStageVisuals(stage);
+    print('the interviews are ${interviews.length}');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(visuals.statusText,
-            style: TextStyle(
-                fontWeight: FontWeight.bold, color: visuals.iconColor)),
+        Text(
+          visuals.statusText,
+          style: AppTextStyles.headline4.copyWith(color: visuals.iconColor),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         const SizedBox(height: 8),
-        Text("📝 ${stage.hiringStageDescription}"),
-        if (stage.statusName == CndidateStageStatus.rejected ||
-            stage.statusName == CndidateStageStatus.withdrawn)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text("💬 Reason: ${'Not specified'}",
-                style: const TextStyle(fontStyle: FontStyle.italic)),
+        if ((stage.hiringStageDescription ?? '').isNotEmpty)
+          Text(
+            stage.hiringStageDescription ?? '',
+            style: AppTextStyles.bodySmall,
           ),
+        if (stage.statusName == CndidateStageStatus.rejected ||
+            stage.statusName == CndidateStageStatus.withdrawn) ...[
+          const SizedBox(height: 8),
+          Text(
+            'Reason: Not specified',
+            style: AppTextStyles.caption.copyWith(fontStyle: FontStyle.italic),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
         const SizedBox(height: 12),
+
+        // Interviews
         if (stage.statusName != CndidateStageStatus.completed &&
             stage.statusName != CndidateStageStatus.hired &&
             stage.statusName != CndidateStageStatus.selected &&
@@ -421,122 +422,109 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
           const SizedBox(height: 12),
         ],
 
-        // Check if there are assessments in this stage
+        // Assessments
         if (stage.statusName != CndidateStageStatus.completed &&
             stage.statusName != CndidateStageStatus.hired &&
             stage.statusName != CndidateStageStatus.selected &&
             stage.statusName != CndidateStageStatus.rejected) ...[
           if (stage.assessments.isNotEmpty)
-            ...stage.assessments.map((assessment) {
-              return buildAssessmentDetails(assessment);
-            }).toList(),
+            ...stage.assessments.map((a) => buildAssessmentDetails(a)).toList(),
         ],
 
-        if (stage.hiringStageName == "Offer Letter") ...[
-          // Check if there are assessments in this stage
-          if (stage.statusName != CndidateStageStatus.completed &&
-              stage.statusName != CndidateStageStatus.hired &&
-              stage.statusName != CndidateStageStatus.selected &&
-              stage.statusName != CndidateStageStatus.rejected) ...[
-            if (stage.offerLetter != null && stage.offerLetter!.id != null) ...[
-              buildOfferLetterDetails(stage.offerLetter!)
-            ]
-            // ...stage.assessments.map((assessment) {
-            //   return buildAssessmentDetails(assessment);
-            // }).toList(),
-          ]
-        ]
+        // Offer Letter
+        if (stage.hiringStageName == 'Offer Letter' &&
+            stage.statusName != CndidateStageStatus.completed &&
+            stage.statusName != CndidateStageStatus.hired &&
+            stage.statusName != CndidateStageStatus.selected &&
+            stage.statusName != CndidateStageStatus.rejected) ...[
+          if (stage.offerLetter != null && stage.offerLetter!.id != null)
+            buildOfferLetterDetails(stage.offerLetter!, stage),
+        ],
       ],
     );
   }
 
-  Widget buildOfferLetterDetails(OfferLetter offerLetter) {
+  Widget buildOfferLetterDetails(OfferLetter offerLetter, Stage stage) {
     return Card(
+      color: AppColors.surface,
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "offer letter",
-              // offerLetter.title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
+            Text('Offer Letter', style: AppTextStyles.headline3),
             const SizedBox(height: 8),
-            // Text("📝 Task: ${assessment.description}"),
-
-            // If there's a task file, show a button to download or view it
-            if (offerLetter.offerLetterFileId != null &&
-                offerLetter.offerLetterFilePath!.isNotEmpty)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.file_download, color: Colors.white),
-                onPressed: () {
-                  // Here you would handle opening or downloading the file
-                  _downloadTaskFile(offerLetter.offerLetterFilePath!);
-                },
-                label: const Text("Download Offer Letter",
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
+            if ((offerLetter.offerLetterFileId ?? '').isNotEmpty &&
+                (offerLetter.offerLetterFilePath ?? '').isNotEmpty)
+              _smallButton(
+                icon: Icons.file_download,
+                label: 'Download Offer Letter',
+                onPressed: () =>
+                    _downloadTaskFile(offerLetter.offerLetterFilePath!),
               ),
-
-            // If taskFileId is null, show the option to upload a task
-            if (offerLetter.acceptedLetter == null)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.upload_file, color: Colors.white),
+            if (stage.acceptedLetter == null &&
+                stage.acceptedLetter!.acceptedLetterFilePath == null)
+              _smallButton(
+                icon: Icons.upload_file,
+                label: 'Upload Offer Letter',
                 onPressed: () {
                   showDialog(
                     context: context,
                     builder: (_) => AlertDialog(
+                      backgroundColor: Colors.transparent,
                       insetPadding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 24),
-                      contentPadding: const EdgeInsets.all(0),
+                      contentPadding: EdgeInsets.zero,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)),
                       content: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.9,
+                        height: MediaQuery.of(context).size.height * 0.6,
                         child: BlocProvider.value(
                           value: context.read<UploadBloc>(),
                           child: SingleDocumentUploadDialogContent(
-                            assessmentId: offerLetter.id,
+                            assessmentId: offerLetter.id ?? '',
                             isOffer: true,
                           ),
                         ),
                       ),
                     ),
                   );
-
-                  // Handle file upload functionality
-                  // _uploadTaskFile(assessment);
-                  setState(() {
-                    _futureData = loadJsonData();
-                  });
+                  setState(() => _futureData = loadJsonData());
                 },
-                label: const Text(
-                  "Upload Offer letter",
-                  style: TextStyle(color: AppColors.background, fontSize: 12),
-                ),
               ),
-
-            if (offerLetter.acceptedLetter != null &&
-                offerLetter.acceptedLetterFilePath != null) ...[
-              ElevatedButton.icon(
-                icon: const Icon(Icons.remove_red_eye_outlined,
-                    color: Colors.white),
+            if (stage.acceptedLetter != null &&
+                stage.acceptedLetter!.acceptedLetterFilePath != null)
+              _smallButton(
+                icon: Icons.remove_red_eye_outlined,
+                label: 'Submitted Offer Letter',
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => InAppWebViewPage(
-                        url:
-                            '${ApiUrl.imageUrl}${offerLetter.acceptedLetterFilePath}',
+                  if (Platform.isAndroid) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => InAppWebViewPage(
+                          url:
+                              'https://docs.google.com/gview?embedded=1&url=${ApiUrl.imageUrl}${stage.acceptedLetter!.acceptedLetterFilePath}',
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => InAppWebViewPage(
+                          url:
+                              '${ApiUrl.imageUrl}${stage.acceptedLetter!.acceptedLetterFilePath}',
+                        ),
+                      ),
+                    );
+                  }
                 },
-                label: const Text("Submitted Offer letter",
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
               ),
-            ]
           ],
         ),
       ),
@@ -545,184 +533,182 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
 
   Widget buildAssessmentDetails(Assessment assessment) {
     return Card(
+      color: AppColors.surface,
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              assessment.title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
+            Text(assessment.title ?? '',
+                style: AppTextStyles.bodyLarge,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis),
             const SizedBox(height: 8),
-            Text("📝 Task: ${assessment.description}"),
-
-            // If there's a task file, show a button to download or view it
-            if (assessment.taskFileId != null &&
-                assessment.taskFileId!.isNotEmpty)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.file_download, color: Colors.white),
-                onPressed: () {
-                  // Here you would handle opening or downloading the file
-                  _downloadTaskFile(assessment.taskFile!.path!);
-                },
-                label: const Text("Download Task File",
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
+            // if ((assessment.description ?? '').isNotEmpty)
+            Text('Task: ${assessment.description}',
+                style: AppTextStyles.bodySmall),
+            if ((assessment.taskFileId ?? '').isNotEmpty)
+              _smallButton(
+                icon: Icons.file_download,
+                label: 'Download Task File',
+                onPressed: () => _downloadTaskFile(assessment.taskFile!.path!),
               ),
-
-            // If taskFileId is null, show the option to upload a task
             if (assessment.submittedFile == null ||
-                assessment.submittedFile!.path == null ||
-                assessment.submittedFile!.path!.isEmpty)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.upload_file, color: Colors.white),
+                (assessment.submittedFile!.path ?? '').isEmpty)
+              _smallButton(
+                icon: Icons.upload_file,
+                label: 'Upload Task File',
                 onPressed: () {
                   showDialog(
                     context: context,
                     builder: (_) => AlertDialog(
+                      backgroundColor: Colors.transparent,
                       insetPadding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 24),
-                      contentPadding: const EdgeInsets.all(0),
+                      contentPadding: EdgeInsets.zero,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)),
                       content: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.9,
+                        height: MediaQuery.of(context).size.height * 0.6,
                         child: BlocProvider.value(
                           value: context.read<UploadBloc>(),
                           child: SingleDocumentUploadDialogContent(
-                            assessmentId: assessment.id,
+                            assessmentId: assessment.id ?? '',
                             isOffer: false,
                           ),
                         ),
                       ),
                     ),
                   );
-
-                  // Handle file upload functionality
-                  // _uploadTaskFile(assessment);
-                  setState(() {
-                    _futureData = loadJsonData();
-                  });
+                  setState(() => _futureData = loadJsonData());
                 },
-                label: const Text(
-                  "Upload Task File",
-                  style: TextStyle(color: AppColors.background, fontSize: 12),
-                ),
               ),
-
             if (assessment.submittedFile != null &&
-                assessment.submittedFile!.path != null &&
-                assessment.submittedFile!.path!.isNotEmpty) ...[
-              ElevatedButton.icon(
-                icon: const Icon(Icons.remove_red_eye_outlined,
-                    color: Colors.white),
+                (assessment.submittedFile!.path ?? '').isNotEmpty)
+              _smallButton(
+                icon: Icons.remove_red_eye_outlined,
+                label: 'View Submitted File',
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => InAppWebViewPage(
-                        url:
-                            '${ApiUrl.imageUrl}${assessment.submittedFile!.path}',
+                  if (Platform.isAndroid) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => InAppWebViewPage(
+                          url:
+                              'https://docs.google.com/gview?embedded=1&url=${ApiUrl.imageUrl}${assessment.submittedFile!.path}',
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => InAppWebViewPage(
+                          url:
+                              '${ApiUrl.imageUrl}${assessment.submittedFile!.path}',
+                        ),
+                      ),
+                    );
+                  }
                 },
-                label: const Text("View Submitted File",
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
               ),
-            ]
           ],
         ),
       ),
     );
   }
-  //ame: woyeb51080@coursora.com  password:  5M04axwe9ll
+
+  Widget _smallButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: SizedBox(
+        height: 44,
+        child: ElevatedButton.icon(
+          icon: Icon(icon, color: Colors.white, size: 18),
+          onPressed: onPressed,
+          label:
+              Text(label, style: AppTextStyles.button.copyWith(fontSize: 14)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+          ),
+        ),
+      ),
+    );
+  }
 
   Future<void> _downloadTaskFile(String fileId) async {
-    // if (await canLaunchUrl(Uri.parse('${ApiUrl.imageUrl}${fileId}'))) {
-    //   await launchUrl(Uri.parse('${ApiUrl.imageUrl}${fileId}'),
-    //       mode: LaunchMode.externalApplication);
-    // } else {
-    //   ToastMessage.showMessage('Could not launch receipt.');
-    // }
-
-    if (await canLaunchUrl(Uri.parse('${ApiUrl.imageUrl}$fileId'))) {
-      await launchUrl(Uri.parse('${ApiUrl.imageUrl}$fileId'),
-          mode: LaunchMode.externalApplication);
+    final uri = Uri.parse('${ApiUrl.imageUrl}$fileId');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      ToastMessage.showMessage('Could not launch receipt.');
+      ToastMessage.showMessage('Could not launch file.');
     }
-    // try {
-    //   // Logic to download the file based on the fileId
-    //   final fileUrl = await ApiService(Dio()).getFileUrl(fileId);
-
-    //   if (await canLaunch(fileUrl)) {
-    //     await launch(
-    //         fileUrl); // Opens the URL (could be a PDF link or file URL)
-    //   } else {
-    //     throw 'Could not launch $fileUrl';
-    //   }
-    // } catch (e) {
-    //   print('Error downloading task file: $e');
-    // }
   }
 
   Widget _buildInterviewDetails(Stage stage, List<Interview> interviews) {
-    final matchingInterviews =
-        interviews.where((i) => i.jobStageId == stage.jobStageId).toList();
+    final matchingInterviews = stage.interviews;
+    // interviews.where((i) => i.jobStageId == stage.jobStageId).toList();
+    print('Matching interviews for stage ${stage.hiringStageName}: '
+        '${matchingInterviews.length}');
 
     if (matchingInterviews.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("🎯 Interviews:",
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        Text('Interviews', style: AppTextStyles.headline3),
         const SizedBox(height: 8),
         ...matchingInterviews.map((interview) => Card(
               margin: const EdgeInsets.only(bottom: 12),
+              color: AppColors.surface,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                side: const BorderSide(color: AppColors.border),
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("🗓 ${formatInterviewDate(interview.scheduledAt)}"),
-                    Text("📛 Round: ${interview.roundName}"),
-                    if (interview.roundDescription?.isNotEmpty ?? false)
-                      Text("📋 ${interview.roundDescription!}"),
-                    Text("🧩 Mode: ${interview.interviewMode.toUpperCase()}"),
-                    if (interview.remarks?.isNotEmpty ?? false)
-                      Text("💬 Remarks: ${interview.remarks}"),
-                    if (interview.interviewMode == 'virtual'
-                        // &&
-                        // interview.meetingLink != null
-                        )
-                      ElevatedButton.icon(
-                        icon: const Icon(
-                          Icons.video_call,
-                          color: Colors.white,
-                        ),
+                    _iconText(Icons.event,
+                        formatInterviewDate(interview.scheduledAt ?? '')),
+                    _iconText(Icons.flag_outlined,
+                        'Round: ${interview.roundName ?? '-'}'),
+                    if ((interview.roundDescription ?? '').isNotEmpty)
+                      _iconText(
+                          Icons.notes_outlined, interview.roundDescription!),
+                    _iconText(Icons.forum_outlined,
+                        'Mode: ${(interview.interviewMode ?? '').toUpperCase()}'),
+                    if ((interview.remarks ?? '').isNotEmpty)
+                      _iconText(Icons.chat_bubble_outline,
+                          'Remarks: ${interview.remarks}'),
+                    const SizedBox(height: 8),
+                    if (interview.interviewMode == 'virtual')
+                      _smallButton(
+                        icon: Icons.video_call,
+                        label: 'Join Meeting',
                         onPressed: () =>
                             launchUrl(Uri.parse(interview.meetingLink!)),
-                        label: Text(
-                          "Join Meeting",
-                          style: AppTextStyles.button.copyWith(
-                              fontSize: 12, fontWeight: FontWeight.w400),
-                        ),
                       ),
                     if (interview.interviewMode == 'physical')
-                      ElevatedButton.icon(
-                        icon: const Icon(
-                          Icons.location_on,
-                          color: Colors.white,
-                        ),
-                        onPressed: () => launchUrl(Uri.parse(
-                            "https://maps.google.com/?q=Interview+Location")),
-                        label: Text(
-                          "View Location",
-                          style: AppTextStyles.button.copyWith(
-                              fontSize: 12, fontWeight: FontWeight.w400),
+                      _smallButton(
+                        icon: Icons.location_on,
+                        label: 'View Location',
+                        onPressed: () => launchUrl(
+                          Uri.parse(
+                              'https://maps.google.com/?q=Interview+Location'),
                         ),
                       ),
                   ],
@@ -733,10 +719,25 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     );
   }
 
+  Widget _iconText(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: AppColors.icon),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(text, style: AppTextStyles.bodySmall),
+          ),
+        ],
+      ),
+    );
+  }
+
   int getCurrentStepIndex(List<Stage> stages) {
-    // Make a copy and sort by jobStageOrder
     final sortedStages = [...stages]
-      ..sort((a, b) => a.jobStageOrder.compareTo(b.jobStageOrder));
+      ..sort((a, b) => a.jobStageOrder!.compareTo(b.jobStageOrder!));
 
     for (int i = 0; i < sortedStages.length; i++) {
       if (sortedStages[i].statusName == CndidateStageStatus.inProgress) {
@@ -747,7 +748,9 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
   }
 }
 
+// -----------------------------
 // DOTTED LINE PAINTER
+// -----------------------------
 class DottedLinePainter extends CustomPainter {
   final double height;
   final Color color;
@@ -813,123 +816,93 @@ _StageVisuals _getStageVisuals(Stage stage) {
   switch (stage.statusName) {
     case CndidateStageStatus.hired:
       return _StageVisuals(
-        circleColor: Colors.green,
-        iconColor: Colors.green,
+        circleColor: AppColors.success,
+        iconColor: AppColors.success,
         icon: Icons.work_outline,
-        lineColor: Colors.grey.shade400,
+        lineColor: AppColors.divider,
         circleChild: const Icon(Icons.check, size: 16, color: Colors.white),
-        statusText: 'Hired 🎉',
+        statusText: 'Hired',
         textColor: Colors.white,
       );
-
     case CndidateStageStatus.selected:
       return _StageVisuals(
-        circleColor: Colors.green,
-        iconColor: Colors.green,
+        circleColor: AppColors.success,
+        iconColor: AppColors.success,
         icon: Icons.check_circle_outline,
-        lineColor: Colors.grey.shade400,
+        lineColor: AppColors.divider,
         circleChild: const Icon(Icons.check, size: 16, color: Colors.white),
-        statusText: 'Selected ✅',
+        statusText: 'Selected',
         textColor: Colors.white,
       );
-
     case CndidateStageStatus.completed:
       return _StageVisuals(
-        circleColor: Colors.green,
-        iconColor: Colors.green,
+        circleColor: AppColors.success,
+        iconColor: AppColors.success,
         icon: Icons.check_circle_outline,
-        lineColor: Colors.grey.shade400,
+        lineColor: AppColors.divider,
         circleChild: const Icon(Icons.check, size: 16, color: Colors.white),
-        statusText: 'Selected ✅',
+        statusText: 'Completed',
         textColor: Colors.white,
       );
-
     case CndidateStageStatus.rejected:
       return _StageVisuals(
-        circleColor: Colors.red,
-        iconColor: Colors.red,
+        circleColor: AppColors.error,
+        iconColor: AppColors.error,
         icon: Icons.cancel_outlined,
-        lineColor: Colors.grey.shade400,
+        lineColor: AppColors.divider,
         circleChild: const Icon(Icons.close, size: 16, color: Colors.white),
-        statusText: 'Rejected ❌',
+        statusText: 'Rejected',
         textColor: Colors.white,
       );
-
     case CndidateStageStatus.withdrawn:
       return _StageVisuals(
-        circleColor: Colors.grey,
-        iconColor: Colors.grey,
+        circleColor: AppColors.border,
+        iconColor: AppColors.border,
         icon: Icons.exit_to_app,
-        lineColor: Colors.grey.shade400,
+        lineColor: AppColors.divider,
         circleChild: const Icon(Icons.close, size: 16, color: Colors.white),
-        statusText: 'Withdrawn ↩️',
-        textColor: Colors.black,
+        statusText: 'Withdrawn',
+        textColor: AppColors.textPrimary,
       );
-
     case CndidateStageStatus.inProgress:
-      return _StageVisuals(
-        circleColor: Colors.blue,
-        iconColor: Colors.blue,
-        icon: Icons.hourglass_top_rounded,
-        lineColor: Colors.grey.shade400,
-        circleChild: Text(
-          '${stage.jobStageOrder + 1}',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        statusText: 'In Progress 🔄',
-        textColor: Colors.white,
-      );
-
     case CndidateStageStatus.in_Progress:
       return _StageVisuals(
-        circleColor: Colors.blue,
-        iconColor: Colors.blue,
+        circleColor: AppColors.inProgress,
+        iconColor: AppColors.inProgress,
         icon: Icons.hourglass_top_rounded,
-        lineColor: Colors.grey.shade400,
+        lineColor: AppColors.divider,
         circleChild: Text(
-          '${stage.jobStageOrder + 1}',
+          '${stage.jobStageOrder! + 1}',
           style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
+              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
         ),
-        statusText: 'In Progress 🔄',
+        statusText: 'In Progress',
         textColor: Colors.white,
       );
-
     case CndidateStageStatus.reviewed:
       return _StageVisuals(
         circleColor: Colors.purple,
         iconColor: Colors.purple,
         icon: Icons.rate_review_outlined,
-        lineColor: Colors.grey.shade400,
+        lineColor: AppColors.divider,
         circleChild: const Icon(Icons.check, size: 16, color: Colors.white),
-        statusText: 'Reviewed 📝',
+        statusText: 'Reviewed',
         textColor: Colors.white,
       );
-
     case CndidateStageStatus.upcoming:
     default:
       return _StageVisuals(
-        circleColor: Colors.grey.shade300,
-        iconColor: Colors.orange,
+        circleColor: AppColors.divider,
+        iconColor: AppColors.warning,
         icon: Icons.access_time,
-        lineColor: Colors.grey.shade400,
+        lineColor: AppColors.divider,
         circleChild: Text(
-          '${stage.jobStageOrder + 1}',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
+          '${stage.jobStageOrder! + 1}',
+          style: const TextStyle(
+              color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
         ),
-        statusText: 'Upcoming ⏳',
-        textColor: Colors.black,
+        statusText: 'Upcoming',
+        textColor: AppColors.textPrimary,
       );
   }
 }

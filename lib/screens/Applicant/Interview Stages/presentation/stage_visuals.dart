@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:rooster_empployee/constants/status.dart';
 import 'package:rooster_empployee/screens/Applicant/Interview%20Stages/models/userModel.dart';
@@ -71,7 +70,7 @@ _StageVisuals _getStageVisuals(Stage stage) {
         icon: Icons.hourglass_top_rounded,
         lineColor: Colors.grey.shade400,
         circleChild: Text(
-          '${stage.jobStageOrder + 1}',
+          '${stage.jobStageOrder! + 1}',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 12,
@@ -88,7 +87,7 @@ _StageVisuals _getStageVisuals(Stage stage) {
         icon: Icons.hourglass_top_rounded,
         lineColor: Colors.grey.shade400,
         circleChild: Text(
-          '${stage.jobStageOrder + 1}',
+          '${stage.jobStageOrder! + 1}',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 12,
@@ -116,7 +115,7 @@ _StageVisuals _getStageVisuals(Stage stage) {
         icon: Icons.access_time,
         lineColor: Colors.grey.shade400,
         circleChild: Text(
-          '${stage.jobStageOrder + 1}',
+          '${stage.jobStageOrder! + 1}',
           style: TextStyle(
             color: Colors.black,
             fontSize: 12,

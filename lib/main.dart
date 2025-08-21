@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -239,6 +238,7 @@ class MyApp extends StatelessWidget {
           title: 'Appointment Scheduler',
           debugShowCheckedModeBanner: false,
           theme: appTheme,
+          
           initialRoute: Routes.SplashScreen,
           onGenerateRoute: RouteGenerator().generateRoute,
           builder: (context, widget) {

@@ -41,7 +41,10 @@ class _InAppWebViewPageState extends State<InAppWebViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('View Document')),
+      appBar: AppBar(
+        title: const Text('View Document'),
+        centerTitle: true,
+      ),
       body: Stack(
         children: [
           if (_hasError)

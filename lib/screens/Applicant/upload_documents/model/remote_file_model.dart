@@ -14,7 +14,7 @@ class RemoteFile {
   factory RemoteFile.fromJson(Map<String, dynamic> json) {
     final path = json['documentPath'] ?? '';
     return RemoteFile(
-      id: path.hashCode.toString(), // if no real ID, use hash of path
+      id: json['documentId'], // if no real ID, use hash of path
       name: json['documentName'] ?? 'Unnamed File',
       path: path,
       type: json['docstype'] ?? 'Document',

@@ -62,6 +62,7 @@ class DocumentService {
 
         final filePath = uploadResponse.data['filePath'];
         final fileId = filePath['id'];
+        final tenentId = filePath['tenantId'];
 
         if (fileId == null) {
           throw Exception("File upload did not return an ID.");
@@ -73,7 +74,11 @@ class DocumentService {
         // 'http://69.62.123.60:3000/api/v1/candidate/dfvdfv/assessment/vfdvdf/submit'
         final metadataResponse = await apiService.dio.patch(
           ApiUrl.uploadOfferLetter + offerLetterId,
-          data: {"candidateId": candidateId, "acceptedLetter": fileId},
+          data: {
+            "candidateId": candidateId,
+            "acceptedLetter": fileId,
+            "tenantId": tenentId
+          },
           options: Options(
             headers: {'Content-Type': 'application/json'},
           ),

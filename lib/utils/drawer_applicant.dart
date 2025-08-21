@@ -164,33 +164,33 @@ class _DrawerWidgetApplicantState extends State<DrawerWidgetApplicant> {
               style: AppTextStyles.bodySmall,
             ),
             onTap: () async {
-              // FlutterSecureData.deleteWholeSecureData();
-              FlutterSecureData.setIsLoggedIn('false');
-              FlutterSecureData.deleteIsHired();
-              Navigator.of(context).pushReplacement(
-                RouteGenerator().generateRoute(
-                  const RouteSettings(name: Routes.login),
-                ),
-              );
-              ToastMessage.showMessage("LogOut Sucessfully");
+              // // FlutterSecureData.deleteWholeSecureData();
+              // FlutterSecureData.setIsLoggedIn('false');
+              // FlutterSecureData.deleteIsHired();
+              // Navigator.of(context).pushReplacement(
+              //   RouteGenerator().generateRoute(
+              //     const RouteSettings(name: Routes.login),
+              //   ),
+              // );
+              // ToastMessage.showMessage("LogOut Sucessfully");
 
-              // try {
-              //   final value = await ApiService(Dio()).logout();
-              //   if (value) {
-              //     FlutterSecureData.setIsLoggedIn('false');
-              //     FlutterSecureData.deleteIsHired();
-              //     Navigator.of(context).pushReplacement(
-              //       RouteGenerator().generateRoute(
-              //         const RouteSettings(name: Routes.login),
-              //       ),
-              //     );
-              //     ToastMessage.showMessage("LogOut Sucessfully");
-              //   } else {
-              //     ToastMessage.showMessage("LogOut Failed");
-              //   }
-              // } catch (e) {
-              //   ToastMessage.showMessage("LogOut Failed");
-              // }
+              try {
+                final value = await ApiService(Dio()).logout();
+                if (value) {
+                  FlutterSecureData.setIsLoggedIn('false');
+                  FlutterSecureData.deleteIsHired();
+                  Navigator.of(context).pushReplacement(
+                    RouteGenerator().generateRoute(
+                      const RouteSettings(name: Routes.login),
+                    ),
+                  );
+                  ToastMessage.showMessage("LogOut Sucessfully");
+                } else {
+                  ToastMessage.showMessage("LogOut Failed");
+                }
+              } catch (e) {
+                ToastMessage.showMessage("LogOut Failed");
+              }
             },
           ),
         ],

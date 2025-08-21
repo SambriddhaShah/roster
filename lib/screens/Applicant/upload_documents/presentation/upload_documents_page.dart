@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rooster_empployee/constants/appColors.dart';
@@ -6,6 +8,7 @@ import 'package:rooster_empployee/screens/Applicant/upload_documents/bloc/upload
 import 'package:rooster_empployee/screens/Applicant/upload_documents/bloc/upload_state.dart';
 import 'package:rooster_empployee/screens/Applicant/upload_documents/widgets/document_draft_form_widget.dart';
 import 'package:rooster_empployee/service/apiUrls.dart';
+import 'package:rooster_empployee/utils/imageView.dart';
 import 'package:rooster_empployee/utils/tostMessage.dart';
 import 'package:rooster_empployee/utils/webView.dart';
 
@@ -199,14 +202,21 @@ class _UploadDocumentsPageState extends State<UploadDocumentsPage> {
                               GestureDetector(
                                 onTap: () {
                                   print("View file: ${file.path}");
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => InAppWebViewPage(
-                                        url: '${ApiUrl.imageUrl}${file.path}',
+
+                                  if (Platform.isAndroid) {
+                                    final fullUrl =
+                                        '${ApiUrl.imageUrl}${file.path}';
+                                    _openDocumentSmart(context, fullUrl);
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => InAppWebViewPage(
+                                          url: '${ApiUrl.imageUrl}${file.path}',
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  }
                                 },
                                 child: const Row(
                                   children: [
@@ -326,6 +336,30 @@ String getIconAssetForFileType(FileType type) {
     default:
       return 'assets/word.png';
   }
+}
+
+void _openDocumentSmart(BuildContext context, String url) {
+  final l = url.toLowerCase();
+  final isPdf = l.endsWith('.pdf');
+  final isImage = l.endsWith('.png') ||
+      l.endsWith('.jpg') ||
+      l.endsWith('.jpeg') ||
+      l.endsWith('.webp') ||
+      l.endsWith('.gif') ||
+      l.endsWith('.bmp');
+
+  if (isImage) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => ImageViewerPage(url: url)));
+    return;
+  }
+
+  final urlToLoad = isPdf
+      ? 'https://docs.google.com/gview?embedded=1&url=${Uri.encodeFull(url)}'
+      : url;
+
+  Navigator.push(context,
+      MaterialPageRoute(builder: (_) => InAppWebViewPage(url: urlToLoad)));
 }
 
 Widget buildFileIcon(String filePath) {

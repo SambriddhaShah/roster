@@ -135,12 +135,12 @@ class JobApplication {
 }
 
 class Job {
-  final String id;
-  final String tenantId;
-  final String title;
-  final String description;
-  final String pageId;
-  final String formId;
+  final String? id;
+  final String? tenantId;
+  final String? title;
+  final String? description;
+  final String? pageId;
+  final String? formId;
   final String? employmentTypeId;
   final String? department;
   final String? hiringStageId;
@@ -148,8 +148,8 @@ class Job {
   final String? archivedAt;
   final String createdBy;
   final String? updatedBy;
-  final String createdAt;
-  final String updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
 
   Job({
     required this.id,
@@ -191,14 +191,14 @@ class Job {
 }
 
 class Application {
-  final String id;
-  final String tenantId;
-  final String jobId;
-  final String candidateId;
-  final String jobStageId;
-  final String statusId;
-  final String createdAt;
-  final String updatedAt;
+  final String? id;
+  final String? tenantId;
+  final String? jobId;
+  final String? candidateId;
+  final String? jobStageId;
+  final String? statusId;
+  final String? createdAt;
+  final String? updatedAt;
 
   Application({
     required this.id,
@@ -226,30 +226,34 @@ class Application {
 }
 
 class Stage {
-  final String candidateStageId;
-  final String jobStageId;
-  final String statusId;
-  final String movedAt;
-  final int jobStageOrder;
-  final String hiringStageName;
-  final String hiringStageDescription;
-  final String statusName;
-  final String statusType;
+  final String? candidateStageId;
+  final String? jobStageId;
+  final String? statusId;
+  final String? movedAt;
+  final int? jobStageOrder;
+  final String? hiringStageName;
+  final String? hiringStageDescription;
+  final String? statusName;
+  final String? statusType;
   final List<Assessment> assessments;
+  final List<Interview> interviews;
+  final AcceptedLetter? acceptedLetter;
+
   final OfferLetter? offerLetter;
-  Stage({
-    required this.candidateStageId,
-    required this.jobStageId,
-    required this.statusId,
-    required this.movedAt,
-    required this.jobStageOrder,
-    required this.hiringStageName,
-    required this.hiringStageDescription,
-    required this.statusName,
-    required this.statusType,
-    required this.assessments,
-    this.offerLetter,
-  });
+  Stage(
+      {required this.candidateStageId,
+      required this.jobStageId,
+      required this.statusId,
+      required this.movedAt,
+      required this.jobStageOrder,
+      required this.hiringStageName,
+      required this.hiringStageDescription,
+      required this.statusName,
+      required this.statusType,
+      required this.assessments,
+      required this.interviews,
+      this.offerLetter,
+      this.acceptedLetter});
 
   factory Stage.fromJson(Map<String, dynamic> json) {
     return Stage(
@@ -268,20 +272,27 @@ class Stage {
       offerLetter: json['offerLetter'] != null
           ? OfferLetter.fromJson(json['offerLetter'])
           : null,
+      interviews: (json['interviews'] as List?)
+              ?.map((e) => Interview.fromJson(e))
+              .toList() ??
+          [],
+      acceptedLetter: json['acceptedLetter'] != null
+          ? AcceptedLetter.fromJson(json['acceptedLetter'])
+          : null,
     );
   }
 }
 
 class Interview {
-  final String roundName;
-  final String roundDescription;
-  final String interviewMode;
-  final String scheduledAt;
+  final String? roundName;
+  final String? roundDescription;
+  final String? interviewMode;
+  final String? scheduledAt;
   final String? remarks;
   final String? meetingLink;
-  final String statusId;
-  final String jobStageId;
-  final String stageName;
+  final String? statusId;
+  final String? jobStageId;
+  final String? stageName;
 
   Interview({
     required this.roundName,
@@ -311,9 +322,9 @@ class Interview {
 }
 
 class Assessment {
-  final String id;
-  final String title;
-  final String description;
+  final String? id;
+  final String? title;
+  final String? description;
   final String? taskFileId;
   final String? statusId;
   final String? remarks;
@@ -404,13 +415,12 @@ class SubmittedFile {
 }
 
 class OfferLetter {
-  final String id;
-  final String title;
+  final String? id;
+  final String? title;
   final String? offerLetterFileId;
   final String? offerLetterFilePath;
   final String? offerLetterFileName;
   final String? acceptedLetter;
-  final String? acceptedLetterFilePath;
 
   OfferLetter(
       {required this.id,
@@ -418,8 +428,7 @@ class OfferLetter {
       this.offerLetterFileId,
       this.offerLetterFilePath,
       this.offerLetterFileName,
-      this.acceptedLetter,
-      this.acceptedLetterFilePath});
+      this.acceptedLetter});
 
   factory OfferLetter.fromJson(Map<String, dynamic> json) {
     return OfferLetter(
@@ -429,7 +438,26 @@ class OfferLetter {
       offerLetterFilePath: json['offerLetterFilePath'],
       offerLetterFileName: json['offerLetterFileName'],
       acceptedLetter: json['acceptedLetter'],
+    );
+  }
+}
+
+class AcceptedLetter {
+  final String? id;
+  final String? acceptedLetterFilePath;
+  final String? acceptedLetterFileName;
+
+  AcceptedLetter({
+    required this.id,
+    required this.acceptedLetterFilePath,
+    required this.acceptedLetterFileName,
+  });
+
+  factory AcceptedLetter.fromJson(Map<String, dynamic> json) {
+    return AcceptedLetter(
+      id: json['id'],
       acceptedLetterFilePath: json['acceptedLetterFilePath'],
+      acceptedLetterFileName: json['acceptedLetterFileName'],
     );
   }
 }

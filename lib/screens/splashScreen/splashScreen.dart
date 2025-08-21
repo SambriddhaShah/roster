@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -81,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen>
 
             // App Name
             Text(
-              "Roster",
+              "Omega ATS",
               style: GoogleFonts.poppins(
                 fontSize: 32,
                 fontWeight: FontWeight.w600,
@@ -91,10 +89,10 @@ class _SplashScreenState extends State<SplashScreen>
             ),
 
             // Loading Indicator
-            const SizedBox(height: 30),
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-            ),
+            // const SizedBox(height: 30),
+            // CircularProgressIndicator(
+            //   valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+            // ),
           ],
         ),
       ),
