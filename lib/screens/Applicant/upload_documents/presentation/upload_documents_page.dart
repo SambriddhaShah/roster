@@ -33,6 +33,8 @@ class _UploadDocumentsPageState extends State<UploadDocumentsPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<UploadBloc, UploadState>(
       listener: (context, state) {
+        print(
+            'the success of the state is ${state.isSuccess} and the sucess mesage is ${state.successMessage}');
         if (state.isSuccess) {
           ToastMessage.showMessage(
               state.successMessage ?? "Documents uploaded successfully!");

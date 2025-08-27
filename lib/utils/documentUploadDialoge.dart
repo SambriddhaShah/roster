@@ -41,6 +41,7 @@ class _SingleDocumentUploadDialogContentState
       listener: (context, state) {
         if (state.isSuccess) {
           ToastMessage.showMessage("Assessment Uploaded");
+          context.read<UploadBloc>().add(ClearStatus());
           Navigator.of(context).pop();
         } else if (state.error != null) {
           ToastMessage.showMessage(state.error!);

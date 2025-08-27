@@ -129,7 +129,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
         child: Row(
           children: [
             CircleAvatar(
-              radius: media.width * 0.10,
+              radius: media.width * 0.09,
               backgroundColor: AppColors.primary,
               child: Text(
                 '${candidate.firstName[0]}${candidate.lastName[0]}'

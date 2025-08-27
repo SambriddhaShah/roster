@@ -191,6 +191,8 @@ class UploadBloc extends Bloc<UploadEvent, UploadState> {
       emit(state.copyWith(
         remoteFiles: updatedRemoteFiles,
         deletingFileIds: finalDeletingSet,
+        isSuccess: true,
+        successMessage: "File deleted successfully",
       ));
     } catch (e) {
       final finalDeletingSet = Set<String>.from(state.deletingFileIds)
