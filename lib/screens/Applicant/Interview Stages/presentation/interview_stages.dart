@@ -35,6 +35,38 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
     _futureData = loadJsonData();
   }
 
+  Future<void> _openUploadDialog({
+    required String id,
+    required bool isOffer,
+  }) async {
+    final shouldRefresh = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // prevents outside-tap from returning null
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        contentPadding: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: BlocProvider.value(
+            value: context.read<UploadBloc>(),
+            child: SingleDocumentUploadDialogContent(
+              assessmentId: id,
+              isOffer: isOffer,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+    if (shouldRefresh == true) {
+      setState(() => _futureData = loadJsonData());
+    }
+  }
+
   Future<CandidateResponse?> loadJsonData() async {
     await Future.delayed(const Duration(seconds: 1));
 
@@ -102,7 +134,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                 buildUserCard(candidate, media),
                 const SizedBox(height: 16),
                 buildJobAndStagesCard(
-                  job,
+                  job ?? Job(),
                   stages,
                   currentStep,
                   media,
@@ -437,8 +469,9 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
             stage.statusName != CndidateStageStatus.hired &&
             stage.statusName != CndidateStageStatus.selected &&
             stage.statusName != CndidateStageStatus.rejected) ...[
-          if (stage.offerLetter != null && stage.offerLetter!.id != null)
-            buildOfferLetterDetails(stage.offerLetter!, stage),
+          if (stage.offerLetters.isNotEmpty &&
+              stage.offerLetters.first.id != null)
+            buildOfferLetterDetails(stage.offerLetters.first, stage),
         ],
       ],
     );
@@ -457,47 +490,53 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
           children: [
             Text('Offer Letter', style: AppTextStyles.headline3),
             const SizedBox(height: 8),
-            if ((offerLetter.offerLetterFileId ?? '').isNotEmpty &&
-                (offerLetter.offerLetterFilePath ?? '').isNotEmpty)
+            if (offerLetter.offerLetterFile != null &&
+                (offerLetter.offerLetterFile!.name ?? '').isNotEmpty &&
+                (offerLetter.offerLetterFile!.path ?? '').isNotEmpty)
               _smallButton(
                 icon: Icons.file_download,
                 label: 'Download Offer Letter',
                 onPressed: () =>
-                    _downloadTaskFile(offerLetter.offerLetterFilePath!),
+                    _downloadTaskFile(offerLetter.offerLetterFile!.path!),
               ),
-            if (stage.acceptedLetter == null &&
-                stage.acceptedLetter!.acceptedLetterFilePath == null)
+            if (offerLetter.acceptedLetterFile == null ||
+                offerLetter.acceptedLetterFile!.path == null)
               _smallButton(
                 icon: Icons.upload_file,
                 label: 'Upload Offer Letter',
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      backgroundColor: Colors.transparent,
-                      insetPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 24),
-                      contentPadding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                      content: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        child: BlocProvider.value(
-                          value: context.read<UploadBloc>(),
-                          child: SingleDocumentUploadDialogContent(
-                            assessmentId: offerLetter.id ?? '',
-                            isOffer: true,
-                          ),
-                        ),
-                      ),
-                    ),
+                onPressed: () async {
+                  await _openUploadDialog(
+                    id: offerLetter.id ?? '',
+                    isOffer: true,
                   );
-                  setState(() => _futureData = loadJsonData());
+
+                  // showDialog(
+                  //   context: context,
+                  //   builder: (_) => AlertDialog(
+                  //     backgroundColor: Colors.transparent,
+                  //     insetPadding: const EdgeInsets.symmetric(
+                  //         horizontal: 16, vertical: 24),
+                  //     contentPadding: EdgeInsets.zero,
+                  //     shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(16)),
+                  //     content: SizedBox(
+                  //       width: MediaQuery.of(context).size.width * 0.9,
+                  //       height: MediaQuery.of(context).size.height * 0.6,
+                  //       child: BlocProvider.value(
+                  //         value: context.read<UploadBloc>(),
+                  //         child: SingleDocumentUploadDialogContent(
+                  //           assessmentId: offerLetter.id ?? '',
+                  //           isOffer: true,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // );
+                  // setState(() => _futureData = loadJsonData());
                 },
               ),
-            if (stage.acceptedLetter != null &&
-                stage.acceptedLetter!.acceptedLetterFilePath != null)
+            if (offerLetter.acceptedLetterFile != null &&
+                offerLetter.acceptedLetterFile!.path != null)
               _smallButton(
                 icon: Icons.remove_red_eye_outlined,
                 label: 'Submitted Offer Letter',
@@ -508,7 +547,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                       MaterialPageRoute(
                         builder: (_) => InAppWebViewPage(
                           url:
-                              'https://docs.google.com/gview?embedded=1&url=${ApiUrl.imageUrl}${stage.acceptedLetter!.acceptedLetterFilePath}',
+                              'https://docs.google.com/gview?embedded=1&url=${ApiUrl.imageUrl}${offerLetter.acceptedLetterFile!.path}',
                         ),
                       ),
                     );
@@ -518,7 +557,7 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
                       MaterialPageRoute(
                         builder: (_) => InAppWebViewPage(
                           url:
-                              '${ApiUrl.imageUrl}${stage.acceptedLetter!.acceptedLetterFilePath}',
+                              '${ApiUrl.imageUrl}${offerLetter.acceptedLetterFile!.path}',
                         ),
                       ),
                     );
@@ -561,30 +600,34 @@ class _InterviewDashboardPageState extends State<InterviewDashboardPage> {
               _smallButton(
                 icon: Icons.upload_file,
                 label: 'Upload Task File',
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      backgroundColor: Colors.transparent,
-                      insetPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 24),
-                      contentPadding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                      content: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        child: BlocProvider.value(
-                          value: context.read<UploadBloc>(),
-                          child: SingleDocumentUploadDialogContent(
-                            assessmentId: assessment.id ?? '',
-                            isOffer: false,
-                          ),
-                        ),
-                      ),
-                    ),
+                onPressed: () async {
+                  await _openUploadDialog(
+                    id: assessment.id ?? '',
+                    isOffer: false,
                   );
-                  setState(() => _futureData = loadJsonData());
+                  // showDialog(
+                  //   context: context,
+                  //   builder: (_) => AlertDialog(
+                  //     backgroundColor: Colors.transparent,
+                  //     insetPadding: const EdgeInsets.symmetric(
+                  //         horizontal: 16, vertical: 24),
+                  //     contentPadding: EdgeInsets.zero,
+                  //     shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(16)),
+                  //     content: SizedBox(
+                  //       width: MediaQuery.of(context).size.width * 0.9,
+                  //       height: MediaQuery.of(context).size.height * 0.6,
+                  //       child: BlocProvider.value(
+                  //         value: context.read<UploadBloc>(),
+                  //         child: SingleDocumentUploadDialogContent(
+                  //           assessmentId: assessment.id ?? '',
+                  //           isOffer: false,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // );
+                  // setState(() => _futureData = loadJsonData());
                 },
               ),
             if (assessment.submittedFile != null &&

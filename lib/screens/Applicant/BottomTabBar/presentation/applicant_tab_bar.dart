@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rooster_empployee/constants/appColors.dart';
-import 'package:rooster_empployee/screens/Applicant/Interview%20Stages/presentation/interview_stages.dart';
+// import 'package:rooster_empployee/screens/Applicant/interview_dashboard/presentation/interview_dashboard_screen.dart';
 import 'package:rooster_empployee/screens/Applicant/upload_documents/presentation/upload_documents_page.dart';
+
+import '../../Interview Stages/presentation/interview_stages.dart';
 
 class CandidateMainPage extends StatefulWidget {
   @override
