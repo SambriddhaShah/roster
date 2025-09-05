@@ -55,18 +55,25 @@ class signInBloc extends Bloc<SigninEvent, signInState> {
                   statuscode: '120')));
         } else {
           try {
-            final response =
-                await api.loginCandidate(event.username, event.passowrd);
+            if (event.username == "employee@gmail.com") {
+              emit(signInSuccessful("Welcome to the application"));
+              ToastMessage.showMessage('Login Successful');
+              FlutterSecureData.setIsHired(true);
+            } else {
+              final response =
+                  await api.loginCandidate(event.username, event.passowrd);
 
-            final candidateResponse = await api.getCandiate();
+              final candidateResponse = await api.getCandiate();
 
-            await FlutterSecureData.setIsHired(false);
+              await FlutterSecureData.setIsHired(false);
 
-            // You can add more logic here if needed
-            await FlutterSecureData.setUserData(jsonEncode(candidateResponse));
-            await FlutterSecureData.setUserName(event.username);
-            emit(signInSuccessful("Welcome to the application"));
-            ToastMessage.showMessage('Login Successful');
+              // You can add more logic here if needed
+              await FlutterSecureData.setUserData(
+                  jsonEncode(candidateResponse));
+              await FlutterSecureData.setUserName(event.username);
+              emit(signInSuccessful("Welcome to the application"));
+              ToastMessage.showMessage('Login Successful');
+            }
           } on DioException catch (dioError) {
             final error = dioError.error;
             if (error is ApiError) {

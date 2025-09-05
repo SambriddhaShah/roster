@@ -686,24 +686,24 @@ class _LoginPageState extends State<LoginPage> {
                         ),
 
                         // Bottom: create account
-                        // SizedBox(height: 20.h),
-                        // Row(
-                        //   mainAxisAlignment: MainAxisAlignment.center,
-                        //   children: [
-                        //     Text("Don't have an account? ",
-                        //         style: AppTextStyles.bodySmall),
-                        //     TextButton(
-                        //       onPressed: () {
-                        //         Navigator.of(context).push(
-                        //           RouteGenerator().generateRoute(
-                        //               const RouteSettings(name: Routes.signup)),
-                        //         );
-                        //       },
-                        //       child: const Text("Create an account"),
-                        //     ),
-                        //   ],
-                        // ),
-                        // SizedBox(height: 12.h),
+                        SizedBox(height: 20.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Don't have an account? ",
+                                style: AppTextStyles.bodySmall),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  RouteGenerator().generateRoute(
+                                      const RouteSettings(name: Routes.signup)),
+                                );
+                              },
+                              child: const Text("Create an account"),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12.h),
                       ],
                     ),
                   ),
@@ -719,9 +719,15 @@ class _LoginPageState extends State<LoginPage> {
 
   void _handleSuccessfulLogin() {
     FlutterSecureData.setIsLoggedIn('true');
+    if (username.text == "employee@gmail.com") {
+      Navigator.of(context).pushReplacement(
+        RouteGenerator()
+            .generateRoute(const RouteSettings(name: Routes.botomNav)),
+      );
+    }
     Navigator.of(context).pushReplacement(
       RouteGenerator()
-          .generateRoute(const RouteSettings(name: Routes.applicantMainPage)),
+          .generateRoute(const RouteSettings(name: Routes.botomNav)),
     );
   }
 

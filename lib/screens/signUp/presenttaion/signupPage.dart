@@ -59,7 +59,7 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.background,
       body: BlocConsumer<SignupBloc, SignupState>(
         listener: (context, state) {
           if (state is SignupError) {
@@ -76,11 +76,16 @@ class _SignupPageState extends State<SignupPage> {
         },
         builder: (context, state) {
           return Scaffold(
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.background,
             appBar: AppBar(
-              title: Text(
+              backgroundColor: AppColors.background,
+              foregroundColor: AppColors.primary,
+              primary: true,
+              title: const Text(
                 'Sign Up',
+                style: TextStyle(color: AppColors.primary),
               ),
+              iconTheme: IconThemeData(color: AppColors.primary),
               centerTitle: true,
             ),
             body: PopScope(
@@ -129,7 +134,7 @@ class _SignupPageState extends State<SignupPage> {
         SizedBox(height: 10.h),
         Text(
           'Add Profile Photo',
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.surface),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.primary),
         ),
       ],
     );
@@ -139,13 +144,21 @@ class _SignupPageState extends State<SignupPage> {
     return Container(
       padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
-        color: AppColors.primaryLight.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(20.r),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          )
+        ],
       ),
       child: Column(
         children: [
           Text('Create Account',
-              style: AppTextStyles.headline2.copyWith(color: Colors.white)),
+              style:
+                  AppTextStyles.headline2.copyWith(color: AppColors.primary)),
           SizedBox(height: 20.h),
           _buildNameFields(firstNamekey, lastNamekey),
           SizedBox(height: 15.h),

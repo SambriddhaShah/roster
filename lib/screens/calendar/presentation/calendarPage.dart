@@ -42,66 +42,93 @@ class _CalendarPageState extends State<CalendarPage> {
           }
         },
         builder: (context, state) {
-          return Stack(
-            children: [
-              Column(
-                children: [
-                  HeaderWidget(),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.2,
-                    margin: EdgeInsets.fromLTRB(10.w, 0, 0, 10.h),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                Text(DateFormat('MMMM d, yyyy').format(DateTime.now()),
-                                    style: AppTextStyles.caption),
-                                Text('Today', style: AppTextStyles.headline2),
-                              ],
-                            ),
-                            ElevatedButton(onPressed: (){
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>NotesPage()));
-                            }, child: Row(children: [
-                              const Icon(Icons.add, color: Colors.white,),
-                              Text('Add Note', style: AppTextStyles.button.copyWith(color: Colors.white),)
-                            ],))
-                          ],
-                        ),
-                        SizedBox(height: 10.h),
-                        SizedBox(
-                          height: 90.h,
-                          child: DatePicker(
-                            DateTime.now(),
-                            initialSelectedDate: _selectedDate,
-                            selectionColor: AppColors.primary,
-                            selectedTextColor: Colors.white,
-                            onDateChange: (date) {
-                              setState(() => _selectedDate = date);
-                              context
-                                  .read<CalendarBloc>()
-                                  .add(SelectDateEvent(date));
-                            },
+          return Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    HeaderWidget(),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.2,
+                      margin: EdgeInsets.fromLTRB(10.w, 0, 0, 10.h),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                children: [
+                                  Text(
+                                      DateFormat('MMMM d, yyyy')
+                                          .format(DateTime.now()),
+                                      style: AppTextStyles.caption),
+                                  Text('Today', style: AppTextStyles.headline2),
+                                ],
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.38,
+                                height: 40.h,
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  NotesPage()));
+                                    },
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                        ),
+                                        Text(
+                                          'Add Note',
+                                          style: AppTextStyles.button
+                                              .copyWith(color: Colors.white),
+                                        )
+                                      ],
+                                    )),
+                              )
+                            ],
                           ),
-                        ),
+                          SizedBox(height: 10.h),
+                          SizedBox(
+                            height: 90.h,
+                            child: DatePicker(
+                              DateTime.now(),
+                              initialSelectedDate: _selectedDate,
+                              selectionColor: AppColors.primary,
+                              selectedTextColor: Colors.white,
+                              onDateChange: (date) {
+                                setState(() => _selectedDate = date);
+                                context
+                                    .read<CalendarBloc>()
+                                    .add(SelectDateEvent(date));
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('My Notes', style: AppTextStyles.headline3),
                       ],
                     ),
-                  ),
-                  Row(mainAxisAlignment: MainAxisAlignment.center,children: [
-                    Text('My Notes', style: AppTextStyles.headline3),
-                  ],),
-                  Expanded(
-                    child: state is CalendarSuccessful
-                        ? _buildTaskList(state.tasks)
-                        : const Center(child: Text('No tasks found')),
-                  ),
-                ],
-              ),
-              if (state is CalendarLoading) LoadingWidget(child: Container()),
-            ],
+                    Expanded(
+                      child: state is CalendarSuccessful
+                          ? _buildTaskList(state.tasks)
+                          : const Center(child: Text('No tasks found')),
+                    ),
+                  ],
+                ),
+                if (state is CalendarLoading) LoadingWidget(child: Container()),
+              ],
+            ),
           );
         },
       ),

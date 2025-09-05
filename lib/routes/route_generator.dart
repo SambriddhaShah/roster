@@ -58,27 +58,28 @@ class RouteGenerator {
           builder: (_) => SplashScreen(),
         );
 
-      // case Routes.dashboard:
-      // return PageRouteBuilder(
-      //   transitionDuration: const Duration(milliseconds: 500),
-      //   pageBuilder: (_, __, ___) {
-      //      return MultiBlocProvider(
-      //     providers: [
-      //        BlocProvider<DashboardBloc>.value(
-      //       value: _dashboardBloc,
-      //     ),
-      //     ],
-      //     child: const DashboardPage(),
-      //   );
-      //   },
-      //   transitionsBuilder: (_, animation, __, child) {
-      //     return SlideTransition(
-      //       position: Tween<Offset>(
-      //         begin: const Offset(1.0, 0.0),
-      //         end: Offset.zero,
-      //       ).animate(animation),
-      //       child: child,
-      //     );});
+      case Routes.dashboard:
+        return PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 500),
+            pageBuilder: (_, __, ___) {
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider<DashboardBloc>.value(
+                    value: _dashboardBloc,
+                  ),
+                ],
+                child: const DashboardPage(),
+              );
+            },
+            transitionsBuilder: (_, animation, __, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
+            });
 
       case Routes.login:
         return MaterialPageRoute(

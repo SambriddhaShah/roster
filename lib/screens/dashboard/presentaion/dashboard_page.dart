@@ -528,25 +528,25 @@ class _DashboardPageState extends State<DashboardPage> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                data.taskTitle,
-                                style: AppTextStyles.bodySmall
-                                    .copyWith(color: Colors.white),
-                              ),
+                              Text(data.taskTitle,
+                                  style: AppTextStyles.bodySmall
+                                  // .copyWith(color: Colors.white),
+                                  ),
                               Expanded(child: Container()),
                               Icon(
                                 Icons.calendar_month_outlined,
-                                color: Colors.white,
+                                color: AppColors.primary,
                                 size: 15.sp,
                               ),
                               SizedBox(
                                 width: 5.w,
                               ),
                               Text(
-                                DateFormat('yyyy-MM-dd').format(data.startTime),
-                                style: AppTextStyles.caption
-                                    .copyWith(color: Colors.white),
-                              ),
+                                  DateFormat('yyyy-MM-dd')
+                                      .format(data.startTime),
+                                  style: AppTextStyles.caption
+                                  // .copyWith(color: Colors.white),
+                                  ),
                             ],
                           ),
                           // Divider(color: Colors.white,),
@@ -558,41 +558,38 @@ class _DashboardPageState extends State<DashboardPage> {
                               const Center(
                                   child: Icon(
                                 Icons.watch_later_outlined,
-                                color: Colors.white,
+                                color: AppColors.primary,
                               )),
                               SizedBox(
                                 width: 2.w,
                               ),
                               Text(
-                                '${_formatTime(data.startTime)} - ${_formatTime(data.endTime)}',
-                                style: AppTextStyles.bodySmall
-                                    .copyWith(color: Colors.white),
-                              )
+                                  '${_formatTime(data.startTime)} - ${_formatTime(data.endTime)}',
+                                  style: AppTextStyles.bodySmall
+                                  // .copyWith(color: Colors.white),
+                                  )
                             ],
                           ),
                           SizedBox(height: 5.h),
-                          Text(
-                            data.taskDescription,
-                            style: AppTextStyles.caption
-                                .copyWith(color: Colors.white),
-                          ),
+                          Text(data.taskDescription,
+                              style: AppTextStyles.caption
+                              // .copyWith(color: Colors.white),
+                              ),
                           SizedBox(height: 5.h),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Icon(
                                 Icons.location_on_outlined,
-                                color: AppColors.surface,
+                                color: AppColors.primary,
                                 size: 20.sp,
                               ),
                               SizedBox(
                                 width: 2.w,
                               ),
-                              Text(
-                                data.location,
-                                style: AppTextStyles.caption
-                                    .copyWith(color: Colors.white),
-                              ),
+                              Text(data.location, style: AppTextStyles.caption
+                                  // .copyWith(color: Colors.white),
+                                  ),
                             ],
                           ),
                         ],
@@ -921,13 +918,13 @@ class _DashboardPageState extends State<DashboardPage> {
         : SlideAction(
             height: 60,
             sliderButtonIcon:
-                const Icon(Icons.arrow_forward, color: AppColors.surface),
+                const Icon(Icons.arrow_forward, color: AppColors.primary),
             sliderButtonIconPadding: 12,
             sliderButtonIconSize: 24,
             text: isCheckedIn ? 'Slide to Check Out' : 'Slide to Check In',
             textStyle: AppTextStyles.button.copyWith(color: AppColors.surface),
-            outerColor: AppColors.primaryLight,
-            innerColor: AppColors.primaryDark,
+            outerColor: AppColors.primary,
+            innerColor: AppColors.primaryLight,
             borderRadius: 15.r,
             elevation: 2,
             onSubmit: () async {

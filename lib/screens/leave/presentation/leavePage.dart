@@ -142,31 +142,37 @@ class _LeavePageState extends State<LeavePage> {
           ],
         ),
         SizedBox(height: 25.h),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                final taskData = {
-                  'title': _titleController.text,
-                  'note': _noteController.text,
-                  'date': _selectedDate.toString(),
-                  'color': _selectedColor.toString(),
-                };
-                setState(() {
-                  tasks.add(taskData);
-                });
+        SizedBox(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.7,
+                height: 50.h,
+                child: ElevatedButton(
+                  onPressed: () {
+                    final taskData = {
+                      'title': _titleController.text,
+                      'note': _noteController.text,
+                      'date': _selectedDate.toString(),
+                      'color': _selectedColor.toString(),
+                    };
+                    setState(() {
+                      tasks.add(taskData);
+                    });
 
-                _titleController.clear();
-                _noteController.clear();
-              },
-              child: const Text('Create Leave Appeal',
-                  style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                  // minimumSize: Size(double.infinity, 50.h),
+                    _titleController.clear();
+                    _noteController.clear();
+                  },
+                  child: const Text('Create Leave Appeal',
+                      style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50.h),
                   ),
-            ),
-          ],
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
